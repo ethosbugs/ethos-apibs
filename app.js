@@ -1,13 +1,18 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Configuración Firebase (usando los parámetros existentes)
+// Configuración de Firebase de ethos-brawl-tracker
 const firebaseConfig = {
-  apiKey: "AIzaSyDpls-yeDmNRoDLq4jXUCKbaiip0A9oXmQ",
-  authDomain: "ethos-chat-dfe0e.firebaseapp.com",
-  projectId: "ethos-chat-dfe0e",
+  apiKey: "AIzaSyDwLTK1bT2nB215W03Ot2N6UxEsLbN36Jk",
+  authDomain: "ethos-brawl-tracker.firebaseapp.com",
+  projectId: "ethos-brawl-tracker",
+  storageBucket: "ethos-brawl-tracker.firebasestorage.app",
+  messagingSenderId: "706650010986",
+  appId: "1:706650010986:web:a36704353f52b094a4e113",
+  measurementId: "G-1G12024961"
 };
 
+// Inicialización de Firebase y Firestore
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
