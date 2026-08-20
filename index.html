@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brawl Stats Evaluator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-ethos_green">
+
+  <!-- POPUP AUTENTICACIÓN -->
+  <div id="authOverlay" class="auth-overlay">
+    <div class="auth-modal">
+      <h2>BRAWL EVALUATOR</h2>
+      <div class="auth-tabs">
+        <button id="tabLogin" class="auth-tab active">Iniciar sesión</button>
+        <button id="tabSignup" class="auth-tab">Crear cuenta</button>
+      </div>
+
+      <div id="loginPanel" class="auth-panel">
+        <input type="text" id="loginName" placeholder="Usuario">
+        <input type="password" id="loginPass" placeholder="Contraseña">
+        <button id="loginBtn" class="auth-primary">Entrar</button>
+      </div>
+
+      <div id="signupPanel" class="auth-panel hidden">
+        <input type="text" id="signupName" placeholder="Usuario">
+        <input type="password" id="signupPass" placeholder="Contraseña">
+        <button id="signupBtn" class="auth-primary">Registrarse</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APLICACIÓN PRINCIPAL -->
+  <div class="main-container">
+    <header class="header">
+      <h1>BRAWL EVALUATOR</h1>
+      <button id="openProfile" class="settings-btn">Perfil / Ajustes</button>
+    </header>
+
+    <!-- BÚSQUEDA Y EVALUACIÓN -->
+    <section class="search-section">
+      <input type="text" id="tagInput" placeholder="Introduce el #TAG del jugador (ej: #9LU69RPJ9)">
+      <button id="searchBtn">Simular Evaluación</button>
+    </section>
+
+    <!-- TARJETA GENERADA -->
+    <main class="card-container">
+      <div class="brawl-card" id="brawlCard">
+        <div class="card-header">
+          <div class="user-info">
+            <h2 id="cardName">JUGADOR</h2>
+            <span id="cardTag">#00000000</span>
+          </div>
+          <div class="card-badge" id="cardRank">-</div>
+        </div>
+
+        <div class="card-body">
+          <div class="stat-box">
+            <span class="stat-label">Copas Totales</span>
+            <span class="stat-value" id="cardTrophies">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Valor Estimado</span>
+            <span class="stat-value" id="cardValue">$0.00</span>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <p id="cardRoast">Ingresa un #TAG para calcular el valor de la cuenta.</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- PANEL PERFIL / OPCIONES -->
+    <aside id="profilePanel" class="profile-panel hidden">
+      <h2>Perfil Web</h2>
+      <p><strong>Usuario:</strong> <span id="profileName">-</span></p>
+      <p><strong>Cuentas Evaluadas:</strong> <span id="profileCount">0</span></p>
+      <button id="clearLocal" class="theme-btn">Cerrar Sesión</button>
+      <button id="closeProfile" class="theme-btn">Cerrar</button>
+    </aside>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
