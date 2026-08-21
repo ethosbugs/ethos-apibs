@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://*.firebaseio.com; img-src 'self' https: data:;">
-  <link rel="shortcut icon" href="#">
+  <link rel="icon" type="image/png" href="https://cdn3d.iconscout.com/3d/premium/thumb/grafico-ascendente-3d-icon-png-download-12761031.png">
   <title>Habit & Discipline Tracker - Ethos</title>
 
   <style>
@@ -91,7 +91,6 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
 
-    /* BADGE VERIFICADO POR ETHOS */
     .ethos-badge {
       position: absolute;
       top: -14px;
@@ -114,12 +113,16 @@
     }
 
     .auth-subtitle {
-      font-size: 13px;
-      margin-top: 8px;
+      font-size: 12px;
+      margin-top: 10px;
       margin-bottom: 5px;
       font-style: italic;
-      opacity: 0.8;
+      opacity: 0.9;
       color: var(--accent-color);
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .auth-panel { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
@@ -131,7 +134,7 @@
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
     .settings-btn { background: var(--accent-color); border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-    /* BARRA DE MOTIVACIÓN Y RACHA DINÁMICA */
+    /* BARRA DE MOTIVACIÓN Y RACHA */
     .motivation-bar {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
@@ -209,15 +212,21 @@
       font-weight: bold; font-size: 18px;
     }
 
-    /* GRÁFICO DE PUNTOS 14 DÍAS */
-    .dots-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-    .dot {
-      width: 24px; height: 24px; border-radius: 50%; background: var(--dot-empty);
-      transition: background 0.3s, transform 0.2s;
+    /* GRÁFICO DE LÍNEAS MENSUAL */
+    .line-chart-container {
+      width: 100%;
+      height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
     }
-    .dot.active { background: var(--accent-color); transform: scale(1.1); }
+    .line-chart-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
 
-    /* MAPA ANUAL DE ACTIVIDAD (365 DÍAS) */
+    /* MAPA ANUAL DE ACTIVIDAD (365 DÍAS DE IZQUIERDA A DERECHA) */
     .year-grid-container {
       width: 100%;
       overflow-x: auto;
@@ -251,7 +260,6 @@
     .theme-btn { padding: 8px; background: var(--accent-color); border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
     .json-btn { padding: 8px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; cursor: pointer; font-size: 12px; }
 
-    /* PIE DE PÁGINA */
     .creators-footer {
       text-align: center;
       padding: 15px;
@@ -263,19 +271,18 @@
 </head>
 <body class="theme-default">
 
-  <!-- MODAL AUTENTICACIÓN (FIRESTORE) -->
+  <!-- MODAL AUTENTICACIÓN -->
   <div id="authOverlay" class="auth-overlay">
     <div class="auth-modal">
 
-      <!-- LÍNEA 189: Sello "Verificado por Google" -->
-      <div class="ethos-badge">
-        <img src="https://hackaday.com/wp-content/uploads/2016/08/google-g-logo.png" alt="Google Logo">
-        <span>Verificado por Google</span>
+        <div class="ethos-badge">
+          <img src="https://hackaday.com/wp-content/uploads/2016/08/google-g-logo.png" alt="Google Logo">
+          <span>Verificado por Google</span>
         <img src="https://cdn-icons-png.flaticon.com/512/1828/1828640.png" alt="Verificado Icon">
       </div>
 
       <h2>TRACKER HÁBITOS</h2>
-      <p class="auth-subtitle">Introduzca su correo y contraseña</p>
+      <p id="loginQuote" class="auth-subtitle">"Cargando frase..."</p>
 
       <div id="loginPanel" class="auth-panel">
         <input type="text" id="loginName" placeholder="Usuario">
@@ -292,7 +299,6 @@
       <button id="openProfile" class="settings-btn">Ajustes</button>
     </header>
 
-    <!-- FRASE MOTIVACIONAL Y RACHA CON IMÁGENES DINÁMICAS -->
     <div class="motivation-bar">
       <span id="quoteText">"El éxito es la suma de pequeños esfuerzos."</span>
       <span class="streak-tag">
@@ -314,7 +320,6 @@
         <button id="addHabitBtn">Añadir</button>
       </div>
 
-      <!-- FILTROS DINÁMICOS -->
       <div id="filtersBar" class="filters-bar"></div>
 
       <ul id="habitList" class="habit-list"></ul>
@@ -334,13 +339,17 @@
         </div>
       </div>
 
-      <!-- GRÁFICO DE PUNTOS 14 DÍAS -->
+      <!-- GRÁFICO DE LÍNEAS MENSUAL -->
       <div class="chart-card">
-        <h3>Últimos 14 Días</h3>
-        <div id="dotsGrid" class="dots-grid"></div>
+        <h3>Rendimiento Mensual</h3>
+        <div class="line-chart-container">
+          <svg id="monthlyLineChart" class="line-chart-svg" viewBox="0 0 300 100" preserveAspectRatio="none">
+            <!-- La línea y los puntos se generan por JavaScript -->
+          </svg>
+        </div>
       </div>
 
-      <!-- PROGRESO ANUAL (365 DÍAS) -->
+      <!-- PROGRESO ANUAL (365 DÍAS DE IZQUIERDA A DERECHA) -->
       <div class="chart-card full-width">
         <h3>Progreso Anual (365 Días)</h3>
         <div class="year-grid-container">
@@ -371,7 +380,6 @@
     </aside>
   </div>
 
-  <!-- TEXTO DEBAJO DEL CUADRADO PRINCIPAL -->
   <footer class="creators-footer">
     *Creadores de páginas webs
   </footer>
@@ -393,7 +401,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // IMÁGENES DE RACHAS
     const STREAK_ICONS = {
       INACTIVE: "https://img.pikbest.com/png-images/20250706/dark-gray-flame-with-white-outline-isolated-on-transparent-background_11773971.png!sw800",
       LEVEL_1: "https://images.vexels.com/media/users/3/137393/isolated/preview/2a0f2889349241b1d7db900c156da20e-ilustracion-de-dibujos-animados-de-llama-naranja.png",
@@ -403,14 +410,32 @@
       LEVEL_5: "https://png.pngtree.com/png-vector/20241113/ourmid/pngtree-metallic-gold-flame-logo-design-png-image_14413457.png"
     };
 
-    const QUOTES = [
+    // COLECCIÓN AMPLIADA DE CITAS FAMOSAS, SERIES Y PERSONAJES
+    const POP_CULTURE_QUOTES = [
+      "\"No hay nada de malo en ser un perdedor, siempre y cuando seas uno bueno.\" — Walter White (Breaking Bad)",
+      "\"Con un gran poder viene una gran responsabilidad.\" — Uncle Ben (Spider-Man)",
+      "\"Que la Fuerza te acompañe.\" — Han Solo (Star Wars)",
+      "\"Winter is coming.\" — Eddard Stark (Game of Thrones)",
+      "\"I am Iron Man.\" — Tony Stark (Avengers)",
+      "\"No te compares con nadie en este mundo. Si lo haces, te estás insultando a ti mismo.\" — Bill Gates",
+      "\"El único modo de hacer un gran trabajo es amar lo que haces.\" — Steve Jobs",
+      "\"No puedes pasar.\" — Gandalf (El Señor de los Anillos)",
+      "\"La vida es como una caja de bombones, nunca sabes lo que te va a tocar.\" — Forrest Gump",
+      "\"Hakuna Matata, vive y sé feliz.\" — Timón y Pumba (El Rey León)",
+      "\"Caerse está permitido, levantarse es obligatorio.\" — Proverbio Japonés",
+      "\"Un hombre que no pasa tiempo con su familia nunca puede ser un verdadero hombre.\" — Vito Corleone (El Padrino)",
+      "\"Por qué tan serio?\" — Joker (The Dark Knight)",
+      "\"La mente es su propio lugar, y en sí misma puede hacer un cielo del infierno o un infierno del cielo.\" — John Milton",
+      "\"Lo único que debemos temer es al temor mismo.\" — Franklin D. Roosevelt"
+    ];
+
+    const MAIN_QUOTES = [
       "El éxito es la suma de pequeños esfuerzos repetidos día tras día.",
       "No cuentes los días, haz que los días cuenten.",
       "La disciplina es el puente entre tus metas y tus logros.",
       "Tu único límite eres tú mismo."
     ];
 
-    // ESTADO (Se fuerza inicio de sesión cada vez)
     let user = null;
     let habits = JSON.parse(localStorage.getItem("trackerHabits")) || [];
     let history = JSON.parse(localStorage.getItem("trackerHistory")) || {};
@@ -418,10 +443,18 @@
     let currentTheme = localStorage.getItem("trackerTheme") || "theme-default";
     let activeFilter = "Todos";
 
-    // TEMA Y FRASE
     document.body.className = currentTheme;
     document.getElementById("themeSelect").value = currentTheme;
-    document.getElementById("quoteText").textContent = `"${QUOTES[new Date().getDate() % QUOTES.length]}"`;
+    document.getElementById("quoteText").textContent = `"${MAIN_QUOTES[new Date().getDate() % MAIN_QUOTES.length]}"`;
+
+    // CAMBIO ALEATORIO DIARIO DE FRASE DE LOGIN
+    function setDailyLoginQuote() {
+      const today = new Date();
+      const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+      const randomIndex = seed % POP_CULTURE_QUOTES.length;
+      document.getElementById("loginQuote").textContent = POP_CULTURE_QUOTES[randomIndex];
+    }
+    setDailyLoginQuote();
 
     function checkAuth() {
       if (!user) {
@@ -435,7 +468,6 @@
     }
     checkAuth();
 
-    // INICIO DE SESIÓN / REGISTRO AUTOMÁTICO EN FIRESTORE
     document.getElementById("loginBtn").addEventListener("click", async () => {
       const name = document.getElementById("loginName").value.trim();
       const pass = document.getElementById("loginPass").value.trim();
@@ -456,7 +488,6 @@
       checkAuth();
     });
 
-    // GESTIÓN DE CATEGORÍAS
     const categorySelect = document.getElementById("categorySelect");
     categorySelect.addEventListener("change", (e) => {
       if (e.target.value === "__NEW__") {
@@ -484,7 +515,6 @@
         customCategories.map(c => `<button class="filter-btn ${activeFilter === c ? 'active' : ''}" onclick="setFilter('${c}')">${c}</button>`).join('');
     }
 
-    // AÑADIR Y GESTIONAR HÁBITOS
     document.getElementById("addHabitBtn").addEventListener("click", () => {
       const text = document.getElementById("habitInput").value.trim();
       const cat = categorySelect.value;
@@ -538,7 +568,7 @@
       `).join('');
     }
 
-    // GRÁFICOS (DONUT, 14 DÍAS Y ANUAL)
+    // RENDERIZADO DE GRÁFICOS
     function renderCharts() {
       const total = habits.length;
       const done = habits.filter(h => h.completed).length;
@@ -547,22 +577,49 @@
       document.getElementById("pieSegment").setAttribute("stroke-dasharray", `${percent} 100`);
       document.getElementById("piePercent").textContent = `${percent}%`;
 
-      // 14 Días
-      const dotsGrid = document.getElementById("dotsGrid");
-      dotsGrid.innerHTML = "";
-      for (let i = 13; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const dateStr = d.toISOString().split('T')[0];
-        const dayProgress = history[dateStr] || 0;
+      // GRÁFICO DE LÍNEAS MENSUAL (Días del mes actual)
+      const lineSvg = document.getElementById("monthlyLineChart");
+      lineSvg.innerHTML = "";
 
-        const dot = document.createElement("div");
-        dot.className = `dot ${dayProgress >= 0.5 ? 'active' : ''}`;
-        dot.title = `${dateStr}: ${Math.round(dayProgress * 100)}%`;
-        dotsGrid.appendChild(dot);
+      const now = new Date();
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const points = [];
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const d = new Date(now.getFullYear(), now.getMonth(), day);
+        const dateStr = d.toISOString().split('T')[0];
+        const val = history[dateStr] !== undefined ? history[dateStr] : 0;
+        
+        const x = ((day - 1) / (daysInMonth - 1)) * 280 + 10;
+        const y = 90 - (val * 80);
+        points.push({ x, y, val, dateStr });
       }
 
-      // Progreso Anual (365 días)
+      // Dibujar polilínea de tendencia
+      const pointsString = points.map(p => `${p.x},${p.y}`).join(" ");
+      const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+      polyline.setAttribute("fill", "none");
+      polyline.setAttribute("stroke", "var(--accent-color)");
+      polyline.setAttribute("stroke-width", "3");
+      polyline.setAttribute("points", pointsString);
+      lineSvg.appendChild(polyline);
+
+      // Dibujar nodos/puntos
+      points.forEach(p => {
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", p.x);
+        circle.setAttribute("cy", p.y);
+        circle.setAttribute("r", "4");
+        circle.setAttribute("fill", "var(--accent-color)");
+        
+        const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+        title.textContent = `${p.dateStr}: ${Math.round(p.val * 100)}%`;
+        circle.appendChild(title);
+        
+        lineSvg.appendChild(circle);
+      });
+
+      // PROGRESO ANUAL (365 DÍAS - DE IZQUIERDA A DERECHA EN ORDEN CRONOLÓGICO)
       const yearGrid = document.getElementById("yearGrid");
       yearGrid.innerHTML = "";
       for (let i = 364; i >= 0; i--) {
@@ -583,7 +640,6 @@
       }
     }
 
-    // LÓGICA DE RACHAS E IMÁGENES DINÁMICAS
     function calculateStreak() {
       const today = new Date().toISOString().split('T')[0];
       const todayDone = history[today] && history[today] > 0;
@@ -633,7 +689,6 @@
       }
     }
 
-    // EXPORTAR E IMPORTAR JSON
     document.getElementById("exportBtn").addEventListener("click", () => {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ habits, history, customCategories }));
       const dlAnchor = document.createElement('a');
@@ -661,7 +716,6 @@
       reader.readAsText(file);
     });
 
-    // EVENTOS DE INTERFAZ
     document.getElementById("themeSelect").addEventListener("change", (e) => {
       currentTheme = e.target.value;
       document.body.className = currentTheme;
