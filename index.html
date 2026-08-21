@@ -60,7 +60,8 @@
       background: var(--bg-color);
       color: var(--text-color);
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
       min-height: 100vh;
       transition: background 0.3s, color 0.3s;
     }
@@ -82,7 +83,7 @@
     .auth-modal {
       position: relative;
       background: var(--card-bg);
-      padding: 30px 25px 25px 25px;
+      padding: 35px 25px 25px 25px;
       border-radius: 12px;
       border: 2px solid var(--accent-color);
       text-align: center;
@@ -112,20 +113,12 @@
       object-fit: contain;
     }
 
-    .auth-tabs { display: flex; margin: 15px 0; gap: 5px; }
-    .auth-tab {
-      flex: 1; padding: 8px; border: none;
-      background: var(--border-color); color: #fff;
-      cursor: pointer; border-radius: 4px;
-    }
-    .auth-tab.active { background: var(--accent-color); color: #000; font-weight: bold; }
-
-    .auth-panel { display: flex; flex-direction: column; gap: 10px; }
+    .auth-panel { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
     .auth-panel input { padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); }
     .auth-primary { padding: 10px; background: var(--accent-color); border: none; font-weight: bold; cursor: pointer; border-radius: 6px; }
 
     /* CONTENEDOR PRINCIPAL */
-    .main-container { width: 100%; max-width: 750px; padding: 20px; }
+    .main-container { width: 100%; max-width: 750px; padding: 20px; flex: 1; }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
     .settings-btn { background: var(--accent-color); border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
@@ -248,6 +241,15 @@
     .theme-select { padding: 8px; border-radius: 4px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); }
     .theme-btn { padding: 8px; background: var(--accent-color); border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
     .json-btn { padding: 8px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; cursor: pointer; font-size: 12px; }
+
+    /* PIE DE PÁGINA / TEXTO DE CREADORES */
+    .creators-footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 13px;
+      color: var(--text-color);
+      opacity: 0.7;
+    }
   </style>
 </head>
 <body class="theme-default">
@@ -256,29 +258,19 @@
   <div id="authOverlay" class="auth-overlay">
     <div class="auth-modal">
 
-      <!-- LÍNEA 189: Sello "Verificado por ETHOS" -->
+      <!-- LÍNEA 189: Sello "Verificado por Google" -->
       <div class="ethos-badge">
-        <img src="https://img.icons8.com/color/1200/google-logo.jpg" alt="G Logo">
+        <img src="https://images.icon-icons.com/2642/PNG/512/google_logo_g_logo_icon_159348.png" alt="Google Logo">
         <span>Verificado por Google</span>
         <img src="https://cdn-icons-png.flaticon.com/512/1828/1828640.png" alt="Verificado Icon">
       </div>
 
       <h2>TRACKER HÁBITOS</h2>
-      <div class="auth-tabs">
-        <button id="tabLogin" class="auth-tab active">Iniciar sesión</button>
-        <button id="tabSignup" class="auth-tab">Crear cuenta</button>
-      </div>
 
       <div id="loginPanel" class="auth-panel">
         <input type="text" id="loginName" placeholder="Usuario">
         <input type="password" id="loginPass" placeholder="Contraseña">
-        <button id="loginBtn" class="auth-primary">Entrar</button>
-      </div>
-
-      <div id="signupPanel" class="auth-panel hidden">
-        <input type="text" id="signupName" placeholder="Usuario">
-        <input type="password" id="signupPass" placeholder="Contraseña">
-        <button id="signupBtn" class="auth-primary">Registrarse</button>
+        <button id="loginBtn" class="auth-primary">Iniciar sesión</button>
       </div>
     </div>
   </div>
@@ -369,6 +361,11 @@
     </aside>
   </div>
 
+  <!-- TEXTO DEBAJO DEL CUADRADO PRINCIPAL -->
+  <footer class="creators-footer">
+    *Introduzca su correo electrónico.
+  </footer>
+
   <!-- FIREBASE Y LÓGICA DE LA APP -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -428,43 +425,22 @@
     }
     checkAuth();
 
-    // AUTH TAB SWITCH
-    document.getElementById("tabLogin").addEventListener("click", () => {
-      document.getElementById("loginPanel").classList.remove("hidden");
-      document.getElementById("signupPanel").classList.add("hidden");
-      document.getElementById("tabLogin").classList.add("active");
-      document.getElementById("tabSignup").classList.remove("active");
-    });
-    document.getElementById("tabSignup").addEventListener("click", () => {
-      document.getElementById("signupPanel").classList.remove("hidden");
-      document.getElementById("loginPanel").classList.add("hidden");
-      document.getElementById("tabSignup").classList.add("active");
-      document.getElementById("tabLogin").classList.remove("active");
-    });
-
-    // FIRESTORE LOGIN/SIGNUP
-    document.getElementById("signupBtn").addEventListener("click", async () => {
-      const name = document.getElementById("signupName").value.trim();
-      const pass = document.getElementById("signupPass").value.trim();
+    // INICIO DE SESIÓN / REGISTRO AUTOMÁTICO EN FIRESTORE
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const name = document.getElementById("loginName").value.trim();
+      const pass = document.getElementById("loginPass").value.trim();
       if (!name || !pass) return alert("Completa los campos");
 
       const ref = doc(db, "users", name);
       const snap = await getDoc(ref);
-      if (snap.exists()) return alert("El usuario ya existe");
 
-      await setDoc(ref, { password: pass });
-      user = { name };
-      localStorage.setItem("trackerUser", JSON.stringify(user));
-      checkAuth();
-    });
-
-    document.getElementById("loginBtn").addEventListener("click", async () => {
-      const name = document.getElementById("loginName").value.trim();
-      const pass = document.getElementById("loginPass").value.trim();
-      const ref = doc(db, "users", name);
-      const snap = await getDoc(ref);
-
-      if (!snap.exists() || snap.data().password !== pass) return alert("Credenciales incorrectas");
+      if (snap.exists()) {
+        if (snap.data().password !== pass) {
+          return alert("Contraseña incorrecta");
+        }
+      } else {
+        await setDoc(ref, { password: pass });
+      }
 
       user = { name };
       localStorage.setItem("trackerUser", JSON.stringify(user));
