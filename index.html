@@ -5,15 +5,182 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://*.firebaseio.com;">
   <link rel="shortcut icon" href="#">
-  <title>Brawl Stats Evaluator</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body class="theme-ethos_green">
+  <title>Habit & Discipline Tracker</title>
 
-  <!-- POPUP AUTENTICACIÓN -->
+  <style>
+    /* VARIABLES Y TEMAS */
+    :root {
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --text-color: #ffffff;
+      --accent-color: #ffcc00;
+      --accent-hover: #e6b800;
+      --border-color: #333333;
+      --dot-empty: #2a2a2a;
+    }
+
+    body.theme-neon {
+      --bg-color: #0d0221;
+      --card-bg: #0f0826;
+      --text-color: #00f5d4;
+      --accent-color: #7b2cbf;
+      --accent-hover: #9d4edd;
+      --border-color: #5a189a;
+      --dot-empty: #190938;
+    }
+
+    body.theme-light {
+      --bg-color: #f4f6f8;
+      --card-bg: #ffffff;
+      --text-color: #222222;
+      --accent-color: #2563eb;
+      --accent-hover: #1d4ed8;
+      --border-color: #e5e7eb;
+      --dot-empty: #e2e8f0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .hidden { display: none !important; }
+
+    /* MODAL AUTENTICACIÓN */
+    .auth-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .auth-modal {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 12px;
+      border: 2px solid var(--accent-color);
+      text-align: center;
+      width: 320px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .auth-tabs { display: flex; margin: 15px 0; gap: 5px; }
+    .auth-tab {
+      flex: 1; padding: 8px; border: none;
+      background: var(--border-color); color: #fff;
+      cursor: pointer; border-radius: 4px;
+    }
+    .auth-tab.active { background: var(--accent-color); color: #000; font-weight: bold; }
+
+    .auth-panel { display: flex; flex-direction: column; gap: 10px; }
+    .auth-panel input { padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); }
+    .auth-primary { padding: 10px; background: var(--accent-color); border: none; font-weight: bold; cursor: pointer; border-radius: 6px; }
+
+    /* CONTENEDOR PRINCIPAL */
+    .main-container { width: 100%; max-width: 700px; padding: 20px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .settings-btn { background: var(--accent-color); border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+    /* SECCIÓN HÁBITOS */
+    .habits-section {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .add-habit-box { display: flex; gap: 10px; margin-bottom: 15px; }
+    .add-habit-box input { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); }
+    .add-habit-box button { padding: 10px 15px; background: var(--accent-color); border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+    .habit-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .habit-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px; background: var(--bg-color); border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+    .habit-item.completed span { text-decoration: line-through; opacity: 0.6; }
+
+    /* SECCIÓN GRÁFICOS */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+
+    .chart-card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .chart-card h3 { margin-bottom: 15px; font-size: 14px; text-transform: uppercase; opacity: 0.8; }
+
+    /* GRÁFICO CIRCULAR (QUESITO SVG) */
+    .pie-chart-wrapper { position: relative; width: 120px; height: 120px; }
+    .pie-chart-wrapper svg { transform: rotate(-90deg); border-radius: 50%; }
+    .pie-center-text {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 18px;
+    }
+
+    /* GRÁFICO DE PUNTOS (HEATMAP) */
+    .dots-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+    .dot {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: var(--dot-empty);
+      transition: background 0.3s;
+    }
+    .dot.active { background: var(--accent-color); }
+
+    /* PERFIL Y AJUSTES */
+    .profile-panel {
+      position: fixed; top: 70px; right: 20px;
+      background: var(--card-bg); border: 1px solid var(--border-color);
+      padding: 20px; border-radius: 10px; display: flex; flex-direction: column;
+      gap: 12px; z-index: 100; width: 250px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+    .theme-select { padding: 8px; border-radius: 4px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); }
+    .theme-btn { padding: 8px; background: var(--accent-color); border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+  </style>
+</head>
+<body class="theme-default">
+
+  <!-- MODAL AUTENTICACIÓN (FIRESTORE) -->
   <div id="authOverlay" class="auth-overlay">
     <div class="auth-modal">
-      <h2>BRAWL EVALUATOR</h2>
+      <h2>TRACKER DE HÁBITOS</h2>
       <div class="auth-tabs">
         <button id="tabLogin" class="auth-tab active">Iniciar sesión</button>
         <button id="tabSignup" class="auth-tab">Crear cuenta</button>
@@ -36,54 +203,250 @@
   <!-- APLICACIÓN PRINCIPAL -->
   <div class="main-container">
     <header class="header">
-      <h1>BRAWL EVALUATOR</h1>
-      <button id="openProfile" class="settings-btn">Perfil / Ajustes</button>
+      <h1>MI DISCIPLINA</h1>
+      <button id="openProfile" class="settings-btn">Ajustes</button>
     </header>
 
-    <!-- BÚSQUEDA Y EVALUACIÓN -->
-    <section class="search-section">
-      <input type="text" id="tagInput" placeholder="Introduce el #TAG del jugador (ej: #9LU69RPJ9)">
-      <button id="searchBtn">Simular Evaluación</button>
+    <!-- LISTA DE HÁBITOS -->
+    <section class="habits-section">
+      <div class="add-habit-box">
+        <input type="text" id="habitInput" placeholder="Añadir nuevo hábito (ej: Leer 20 min)">
+        <button id="addHabitBtn">Añadir</button>
+      </div>
+      <ul id="habitList" class="habit-list"></ul>
     </section>
 
-    <!-- TARJETA GENERADA -->
-    <main class="card-container">
-      <div class="brawl-card" id="brawlCard">
-        <div class="card-header">
-          <div class="user-info">
-            <h2 id="cardName">JUGADOR</h2>
-            <span id="cardTag">#00000000</span>
-          </div>
-          <div class="card-badge" id="cardRank">-</div>
-        </div>
-
-        <div class="card-body">
-          <div class="stat-box">
-            <span class="stat-label">Copas Totales</span>
-            <span class="stat-value" id="cardTrophies">0</span>
-          </div>
-          <div class="stat-box">
-            <span class="stat-label">Valor Estimado</span>
-            <span class="stat-value" id="cardValue">$0.00</span>
-          </div>
-        </div>
-
-        <div class="card-footer">
-          <p id="cardRoast">Ingresa un #TAG para calcular el valor de la cuenta.</p>
+    <!-- GRÁFICOS -->
+    <section class="charts-grid">
+      <!-- QUESITO / DONUT -->
+      <div class="chart-card">
+        <h3>Progreso Hoy</h3>
+        <div class="pie-chart-wrapper">
+          <svg width="120" height="120" viewBox="0 0 42 42">
+            <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--dot-empty)" stroke-width="5"></circle>
+            <circle id="pieSegment" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--accent-color)" stroke-width="5" stroke-dasharray="0 100" stroke-dashoffset="0"></circle>
+          </svg>
+          <div id="piePercent" class="pie-center-text">0%</div>
         </div>
       </div>
-    </main>
 
-    <!-- PANEL PERFIL / OPCIONES -->
+      <!-- GRÁFICO DE PUNTOS -->
+      <div class="chart-card">
+        <h3>Últimos 14 Días</h3>
+        <div id="dotsGrid" class="dots-grid"></div>
+      </div>
+    </section>
+
+    <!-- PANEL PERFIL Y AJUSTES -->
     <aside id="profilePanel" class="profile-panel hidden">
-      <h2>Perfil Web</h2>
+      <h3>Ajustes de Perfil</h3>
       <p><strong>Usuario:</strong> <span id="profileName">-</span></p>
-      <p><strong>Cuentas Evaluadas:</strong> <span id="profileCount">0</span></p>
+      
+      <label for="themeSelect">Tema Visual:</label>
+      <select id="themeSelect" class="theme-select">
+        <option value="theme-default">Oscuro (Default)</option>
+        <option value="theme-neon">Neón Cyber</option>
+        <option value="theme-light">Claro</option>
+      </select>
+
       <button id="clearLocal" class="theme-btn">Cerrar Sesión</button>
       <button id="closeProfile" class="theme-btn">Cerrar</button>
     </aside>
   </div>
 
-  <script type="module" src="app.js"></script>
+  <!-- FIREBASE Y LÓGICA DE LA APP -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // Configuración Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDwLTK1bT2nB215W03Ot2N6UxEsLbN36Jk",
+      authDomain: "ethos-brawl-tracker.firebaseapp.com",
+      projectId: "ethos-brawl-tracker",
+      storageBucket: "ethos-brawl-tracker.firebasestorage.app",
+      messagingSenderId: "706650010986",
+      appId: "1:706650010986:web:a36704353f52b094a4e113"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // DOM ELEMENTS
+    const authOverlay = document.getElementById("authOverlay");
+    const loginName = document.getElementById("loginName");
+    const loginPass = document.getElementById("loginPass");
+    const loginBtn = document.getElementById("loginBtn");
+    const signupName = document.getElementById("signupName");
+    const signupPass = document.getElementById("signupPass");
+    const signupBtn = document.getElementById("signupBtn");
+
+    const habitInput = document.getElementById("habitInput");
+    const addHabitBtn = document.getElementById("addHabitBtn");
+    const habitList = document.getElementById("habitList");
+    const themeSelect = document.getElementById("themeSelect");
+
+    // ESTADO
+    let user = JSON.parse(localStorage.getItem("trackerUser")) || null;
+    let habits = JSON.parse(localStorage.getItem("trackerHabits")) || [];
+    let history = JSON.parse(localStorage.getItem("trackerHistory")) || {};
+    let currentTheme = localStorage.getItem("trackerTheme") || "theme-default";
+
+    // APLICAR TEMA
+    document.body.className = currentTheme;
+    themeSelect.value = currentTheme;
+
+    // CHECK AUTH
+    function checkAuth() {
+      if (!user) {
+        authOverlay.classList.remove("hidden");
+      } else {
+        authOverlay.classList.add("hidden");
+        document.getElementById("profileName").textContent = user.name;
+        renderHabits();
+        renderCharts();
+      }
+    }
+    checkAuth();
+
+    // PESTAÑAS LOGIN/SIGNUP
+    document.getElementById("tabLogin").addEventListener("click", () => {
+      document.getElementById("loginPanel").classList.remove("hidden");
+      document.getElementById("signupPanel").classList.add("hidden");
+      document.getElementById("tabLogin").classList.add("active");
+      document.getElementById("tabSignup").classList.remove("active");
+    });
+    document.getElementById("tabSignup").addEventListener("click", () => {
+      document.getElementById("signupPanel").classList.remove("hidden");
+      document.getElementById("loginPanel").classList.add("hidden");
+      document.getElementById("tabSignup").classList.add("active");
+      document.getElementById("tabLogin").classList.remove("active");
+    });
+
+    // REGISTRO FIRESTORE
+    signupBtn.addEventListener("click", async () => {
+      const name = signupName.value.trim();
+      const pass = signupPass.value.trim();
+      if (!name || !pass) return alert("Completa los campos");
+
+      const ref = doc(db, "users", name);
+      const snap = await getDoc(ref);
+      if (snap.exists()) return alert("El usuario ya existe");
+
+      await setDoc(ref, { password: pass });
+      user = { name };
+      localStorage.setItem("trackerUser", JSON.stringify(user));
+      checkAuth();
+    });
+
+    // LOGIN FIRESTORE
+    loginBtn.addEventListener("click", async () => {
+      const name = loginName.value.trim();
+      const pass = loginPass.value.trim();
+      const ref = doc(db, "users", name);
+      const snap = await getDoc(ref);
+
+      if (!snap.exists() || snap.data().password !== pass) {
+        return alert("Credenciales incorrectas");
+      }
+
+      user = { name };
+      localStorage.setItem("trackerUser", JSON.stringify(user));
+      checkAuth();
+    });
+
+    // HÁBITOS & LOCALSTORAGE
+    addHabitBtn.addEventListener("click", () => {
+      const text = habitInput.value.trim();
+      if (!text) return;
+
+      habits.push({ id: Date.now(), name: text, completed: false });
+      habitInput.value = "";
+      saveAndRender();
+    });
+
+    window.toggleHabit = (id) => {
+      habits = habits.map(h => h.id === id ? { ...h, completed: !h.completed } : h);
+      saveAndRender();
+    };
+
+    window.deleteHabit = (id) => {
+      habits = habits.filter(h => h.id !== id);
+      saveAndRender();
+    };
+
+    function saveAndRender() {
+      localStorage.setItem("trackerHabits", JSON.stringify(habits));
+      
+      // Actualizar registro del día actual en el historial
+      const today = new Date().toISOString().split('T')[0];
+      const total = habits.length;
+      const done = habits.filter(h => h.completed).length;
+      history[today] = total > 0 ? (done / total) : 0;
+      localStorage.setItem("trackerHistory", JSON.stringify(history));
+
+      renderHabits();
+      renderCharts();
+    }
+
+    function renderHabits() {
+      habitList.innerHTML = habits.map(h => `
+        <li class="habit-item ${h.completed ? 'completed' : ''}">
+          <span>${h.name}</span>
+          <div>
+            <button onclick="toggleHabit(${h.id})" style="padding: 5px 10px; cursor:pointer;">
+              ${h.completed ? '✓' : '◯'}
+            </button>
+            <button onclick="deleteHabit(${h.id})" style="padding: 5px 10px; cursor:pointer; color:red;">✕</button>
+          </div>
+        </li>
+      `).join('');
+    }
+
+    // RENDERIZAR GRÁFICOS
+    function renderCharts() {
+      // 1. Quesito / Donut
+      const total = habits.length;
+      const done = habits.filter(h => h.completed).length;
+      const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+
+      document.getElementById("pieSegment").setAttribute("stroke-dasharray", `${percent} 100`);
+      document.getElementById("piePercent").textContent = `${percent}%`;
+
+      // 2. Gráfico de Puntos (Últimos 14 días)
+      const dotsGrid = document.getElementById("dotsGrid");
+      dotsGrid.innerHTML = "";
+      
+      for (let i = 13; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        const dayProgress = history[dateStr] || 0;
+
+        const dot = document.createElement("div");
+        dot.className = `dot ${dayProgress >= 0.5 ? 'active' : ''}`;
+        dot.title = `${dateStr}: ${Math.round(dayProgress * 100)}%`;
+        dotsGrid.appendChild(dot);
+      }
+    }
+
+    // TEMA Y AJUSTES
+    themeSelect.addEventListener("change", (e) => {
+      currentTheme = e.target.value;
+      document.body.className = currentTheme;
+      localStorage.setItem("trackerTheme", currentTheme);
+    });
+
+    document.getElementById("openProfile").addEventListener("click", () => {
+      document.getElementById("profilePanel").classList.toggle("hidden");
+    });
+    document.getElementById("closeProfile").addEventListener("click", () => {
+      document.getElementById("profilePanel").classList.add("hidden");
+    });
+    document.getElementById("clearLocal").addEventListener("click", () => {
+      localStorage.clear();
+      location.reload();
+    });
+  </script>
 </body>
 </html>
