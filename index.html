@@ -113,6 +113,15 @@
       object-fit: contain;
     }
 
+    .auth-subtitle {
+      font-size: 13px;
+      margin-top: 8px;
+      margin-bottom: 5px;
+      font-style: italic;
+      opacity: 0.8;
+      color: var(--accent-color);
+    }
+
     .auth-panel { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
     .auth-panel input { padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); }
     .auth-primary { padding: 10px; background: var(--accent-color); border: none; font-weight: bold; cursor: pointer; border-radius: 6px; }
@@ -242,7 +251,7 @@
     .theme-btn { padding: 8px; background: var(--accent-color); border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
     .json-btn { padding: 8px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; cursor: pointer; font-size: 12px; }
 
-    /* PIE DE PÁGINA / TEXTO DE CREADORES */
+    /* PIE DE PÁGINA */
     .creators-footer {
       text-align: center;
       padding: 15px;
@@ -260,12 +269,13 @@
 
       <!-- LÍNEA 189: Sello "Verificado por Google" -->
       <div class="ethos-badge">
-        <img src="https://images.icon-icons.com/2642/PNG/512/google_logo_g_logo_icon_159348.png" alt="Google Logo">
+        <img src="https://hackaday.com/wp-content/uploads/2016/08/google-g-logo.png" alt="Google Logo">
         <span>Verificado por Google</span>
         <img src="https://cdn-icons-png.flaticon.com/512/1828/1828640.png" alt="Verificado Icon">
       </div>
 
       <h2>TRACKER HÁBITOS</h2>
+      <p class="auth-subtitle">"La disciplina es la clave del éxito."</p>
 
       <div id="loginPanel" class="auth-panel">
         <input type="text" id="loginName" placeholder="Usuario">
@@ -363,7 +373,7 @@
 
   <!-- TEXTO DEBAJO DEL CUADRADO PRINCIPAL -->
   <footer class="creators-footer">
-    *Introduzca su correo electrónico.
+    *Creadores de páginas webs
   </footer>
 
   <!-- FIREBASE Y LÓGICA DE LA APP -->
@@ -400,8 +410,8 @@
       "Tu único límite eres tú mismo."
     ];
 
-    // ESTADO
-    let user = JSON.parse(localStorage.getItem("trackerUser")) || null;
+    // ESTADO (Se fuerza inicio de sesión cada vez)
+    let user = null;
     let habits = JSON.parse(localStorage.getItem("trackerHabits")) || [];
     let history = JSON.parse(localStorage.getItem("trackerHistory")) || {};
     let customCategories = JSON.parse(localStorage.getItem("trackerCategories")) || ["Salud", "Estudio", "Personal"];
@@ -443,7 +453,6 @@
       }
 
       user = { name };
-      localStorage.setItem("trackerUser", JSON.stringify(user));
       checkAuth();
     });
 
