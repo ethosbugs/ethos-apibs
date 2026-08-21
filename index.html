@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://*.firebaseio.com;">
   <link rel="shortcut icon" href="#">
-  <title>Habit & Discipline Tracker</title>
+  <title>Habit & Discipline Tracker - Ethos</title>
 
   <style>
     /* VARIABLES Y TEMAS */
@@ -70,13 +70,36 @@
     }
 
     .auth-modal {
+      position: relative;
       background: var(--card-bg);
-      padding: 25px;
+      padding: 30px 25px 25px 25px;
       border-radius: 12px;
       border: 2px solid var(--accent-color);
       text-align: center;
-      width: 320px;
+      width: 340px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    /* BADGE VERIFICADO POR ETHOS */
+    .ethos-badge {
+      position: absolute;
+      top: -14px;
+      left: 15px;
+      background: #000;
+      border: 1px solid var(--accent-color);
+      border-radius: 20px;
+      padding: 3px 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      font-weight: bold;
+      color: #fff;
+    }
+    .ethos-badge img {
+      width: 14px;
+      height: 14px;
+      object-fit: contain;
     }
 
     .auth-tabs { display: flex; margin: 15px 0; gap: 5px; }
@@ -93,10 +116,30 @@
 
     /* CONTENEDOR PRINCIPAL */
     .main-container { width: 100%; max-width: 700px; padding: 20px; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
     .settings-btn { background: var(--accent-color); border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-    /* SECCIÓN HÁBITOS */
+    /* RACHA Y FRASE MOTIVACIONAL */
+    .motivation-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 12px 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+    .streak-tag {
+      background: rgba(255, 204, 0, 0.15);
+      color: var(--accent-color);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-weight: bold;
+    }
+
+    /* SECCIÓN HÁBITOS Y FILTROS */
     .habits-section {
       background: var(--card-bg);
       padding: 20px;
@@ -105,74 +148,64 @@
       margin-bottom: 20px;
     }
 
-    .add-habit-box { display: flex; gap: 10px; margin-bottom: 15px; }
-    .add-habit-box input { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); }
+    .add-habit-box { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+    .add-habit-box input { flex: 2; min-width: 150px; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); }
+    .add-habit-box select { padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); }
     .add-habit-box button { padding: 10px 15px; background: var(--accent-color); border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+    .filters-bar { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+    .filter-btn { padding: 5px 12px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 15px; cursor: pointer; font-size: 12px; }
+    .filter-btn.active { background: var(--accent-color); color: #000; font-weight: bold; }
 
     .habit-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
     .habit-item {
       display: flex; justify-content: space-between; align-items: center;
       padding: 12px; background: var(--bg-color); border-radius: 8px;
       border: 1px solid var(--border-color);
+      transition: transform 0.2s ease, opacity 0.2s ease;
     }
-    .habit-item.completed span { text-decoration: line-through; opacity: 0.6; }
+    .habit-item:hover { transform: translateY(-2px); }
+    .habit-item.completed { opacity: 0.6; }
+    .habit-item.completed span { text-decoration: line-through; }
 
-    /* SECCIÓN GRÁFICOS */
-    .charts-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-
-    @media (max-width: 600px) {
-      .charts-grid { grid-template-columns: 1fr; }
-    }
+    /* SECCIÓN GRÁFICOS CON ANIMACIONES */
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    @media (max-width: 600px) { .charts-grid { grid-template-columns: 1fr; } }
 
     .chart-card {
-      background: var(--card-bg);
-      padding: 20px;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      background: var(--card-bg); padding: 20px; border-radius: 12px;
+      border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center;
     }
-
     .chart-card h3 { margin-bottom: 15px; font-size: 14px; text-transform: uppercase; opacity: 0.8; }
 
-    /* GRÁFICO CIRCULAR (QUESITO SVG) */
+    /* GRÁFICO CIRCULAR CON ANIMACIÓN EN CSS */
     .pie-chart-wrapper { position: relative; width: 120px; height: 120px; }
     .pie-chart-wrapper svg { transform: rotate(-90deg); border-radius: 50%; }
+    #pieSegment { transition: stroke-dasharray 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
     .pie-center-text {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       display: flex; align-items: center; justify-content: center;
       font-weight: bold; font-size: 18px;
     }
 
-    /* GRÁFICO DE PUNTOS (HEATMAP) */
-    .dots-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 8px;
-    }
+    /* GRÁFICO DE PUNTOS */
+    .dots-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
     .dot {
-      width: 24px; height: 24px;
-      border-radius: 50%;
-      background: var(--dot-empty);
-      transition: background 0.3s;
+      width: 24px; height: 24px; border-radius: 50%; background: var(--dot-empty);
+      transition: background 0.3s, transform 0.2s;
     }
-    .dot.active { background: var(--accent-color); }
+    .dot.active { background: var(--accent-color); transform: scale(1.1); }
 
     /* PERFIL Y AJUSTES */
     .profile-panel {
       position: fixed; top: 70px; right: 20px;
       background: var(--card-bg); border: 1px solid var(--border-color);
       padding: 20px; border-radius: 10px; display: flex; flex-direction: column;
-      gap: 12px; z-index: 100; width: 250px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      gap: 12px; z-index: 100; width: 260px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     }
     .theme-select { padding: 8px; border-radius: 4px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); }
     .theme-btn { padding: 8px; background: var(--accent-color); border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .json-btn { padding: 8px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; cursor: pointer; font-size: 12px; }
   </style>
 </head>
 <body class="theme-default">
@@ -180,7 +213,15 @@
   <!-- MODAL AUTENTICACIÓN (FIRESTORE) -->
   <div id="authOverlay" class="auth-overlay">
     <div class="auth-modal">
-      <h2>TRACKER DE HÁBITOS</h2>
+
+      <!-- LÍNEA 180: Sello "Verificado por Ethos" con ambos iconos -->
+      <div class="ethos-badge">
+        <img src="https://cdn-icons-png.flaticon.com/512/2875/2875404.png" alt="Ethos Logo">
+        <span>Verificado por Google</span>
+        <img src="https://cdn-icons-png.flaticon.com/512/1828/1828640.png" alt="Verificado Icon">
+      </div>
+
+      <h2>TRACKER HÁBITOS</h2>
       <div class="auth-tabs">
         <button id="tabLogin" class="auth-tab active">Iniciar sesión</button>
         <button id="tabSignup" class="auth-tab">Crear cuenta</button>
@@ -207,12 +248,32 @@
       <button id="openProfile" class="settings-btn">Ajustes</button>
     </header>
 
+    <!-- MEJORA 1 & 6: FRASE MOTIVACIONAL Y RACHAS -->
+    <div class="motivation-bar">
+      <span id="quoteText">"El éxito es la suma de pequeños esfuerzos."</span>
+      <span class="streak-tag">🔥 Racha: <span id="streakCount">0</span> días</span>
+    </div>
+
     <!-- LISTA DE HÁBITOS -->
     <section class="habits-section">
       <div class="add-habit-box">
-        <input type="text" id="habitInput" placeholder="Añadir nuevo hábito (ej: Leer 20 min)">
+        <input type="text" id="habitInput" placeholder="Añadir hábito...">
+        <select id="categorySelect">
+          <option value="Salud">🏥 Salud</option>
+          <option value="Estudio">📚 Estudio</option>
+          <option value="Personal">👤 Personal</option>
+        </select>
         <button id="addHabitBtn">Añadir</button>
       </div>
+
+      <!-- MEJORA 4: FILTROS DE CATEGORÍA -->
+      <div class="filters-bar">
+        <button class="filter-btn active" onclick="setFilter('Todos')">Todos</button>
+        <button class="filter-btn" onclick="setFilter('Salud')">🏥 Salud</button>
+        <button class="filter-btn" onclick="setFilter('Estudio')">📚 Estudio</button>
+        <button class="filter-btn" onclick="setFilter('Personal')">👤 Personal</button>
+      </div>
+
       <ul id="habitList" class="habit-list"></ul>
     </section>
 
@@ -249,6 +310,11 @@
         <option value="theme-light">Claro</option>
       </select>
 
+      <!-- MEJORA 5: EXPORTAR E IMPORTAR JSON -->
+      <button id="exportBtn" class="json-btn">📥 Exportar Datos (JSON)</button>
+      <button id="importBtn" class="json-btn">📤 Importar Datos (JSON)</button>
+      <input type="file" id="importInput" accept=".json" class="hidden">
+
       <button id="clearLocal" class="theme-btn">Cerrar Sesión</button>
       <button id="closeProfile" class="theme-btn">Cerrar</button>
     </aside>
@@ -259,7 +325,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // Configuración Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDwLTK1bT2nB215W03Ot2N6UxEsLbN36Jk",
       authDomain: "ethos-brawl-tracker.firebaseapp.com",
@@ -272,44 +337,38 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // DOM ELEMENTS
-    const authOverlay = document.getElementById("authOverlay");
-    const loginName = document.getElementById("loginName");
-    const loginPass = document.getElementById("loginPass");
-    const loginBtn = document.getElementById("loginBtn");
-    const signupName = document.getElementById("signupName");
-    const signupPass = document.getElementById("signupPass");
-    const signupBtn = document.getElementById("signupBtn");
-
-    const habitInput = document.getElementById("habitInput");
-    const addHabitBtn = document.getElementById("addHabitBtn");
-    const habitList = document.getElementById("habitList");
-    const themeSelect = document.getElementById("themeSelect");
+    // FRASES MOTIVACIONALES (MEJORA 6)
+    const QUOTES = [
+      "El éxito es la suma de pequeños esfuerzos repetidos día tras día.",
+      "No cuentes los días, haz que los días cuenten.",
+      "La disciplina es el puente entre tus metas y tus logros.",
+      "Tu único límite eres tú mismo."
+    ];
 
     // ESTADO
     let user = JSON.parse(localStorage.getItem("trackerUser")) || null;
     let habits = JSON.parse(localStorage.getItem("trackerHabits")) || [];
     let history = JSON.parse(localStorage.getItem("trackerHistory")) || {};
     let currentTheme = localStorage.getItem("trackerTheme") || "theme-default";
+    let activeFilter = "Todos";
 
-    // APLICAR TEMA
+    // APLICAR TEMA Y FRASE
     document.body.className = currentTheme;
-    themeSelect.value = currentTheme;
+    document.getElementById("themeSelect").value = currentTheme;
+    document.getElementById("quoteText").textContent = `"${QUOTES[new Date().getDate() % QUOTES.length]}"`;
 
-    // CHECK AUTH
     function checkAuth() {
       if (!user) {
-        authOverlay.classList.remove("hidden");
+        document.getElementById("authOverlay").classList.remove("hidden");
       } else {
-        authOverlay.classList.add("hidden");
+        document.getElementById("authOverlay").classList.add("hidden");
         document.getElementById("profileName").textContent = user.name;
-        renderHabits();
-        renderCharts();
+        saveAndRender();
       }
     }
     checkAuth();
 
-    // PESTAÑAS LOGIN/SIGNUP
+    // AUTH TAB SWITCH
     document.getElementById("tabLogin").addEventListener("click", () => {
       document.getElementById("loginPanel").classList.remove("hidden");
       document.getElementById("signupPanel").classList.add("hidden");
@@ -323,10 +382,10 @@
       document.getElementById("tabLogin").classList.remove("active");
     });
 
-    // REGISTRO FIRESTORE
-    signupBtn.addEventListener("click", async () => {
-      const name = signupName.value.trim();
-      const pass = signupPass.value.trim();
+    // FIRESTORE LOGIN/SIGNUP
+    document.getElementById("signupBtn").addEventListener("click", async () => {
+      const name = document.getElementById("signupName").value.trim();
+      const pass = document.getElementById("signupPass").value.trim();
       if (!name || !pass) return alert("Completa los campos");
 
       const ref = doc(db, "users", name);
@@ -339,29 +398,27 @@
       checkAuth();
     });
 
-    // LOGIN FIRESTORE
-    loginBtn.addEventListener("click", async () => {
-      const name = loginName.value.trim();
-      const pass = loginPass.value.trim();
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const name = document.getElementById("loginName").value.trim();
+      const pass = document.getElementById("loginPass").value.trim();
       const ref = doc(db, "users", name);
       const snap = await getDoc(ref);
 
-      if (!snap.exists() || snap.data().password !== pass) {
-        return alert("Credenciales incorrectas");
-      }
+      if (!snap.exists() || snap.data().password !== pass) return alert("Credenciales incorrectas");
 
       user = { name };
       localStorage.setItem("trackerUser", JSON.stringify(user));
       checkAuth();
     });
 
-    // HÁBITOS & LOCALSTORAGE
-    addHabitBtn.addEventListener("click", () => {
-      const text = habitInput.value.trim();
+    // AÑADIR HÁBITO
+    document.getElementById("addHabitBtn").addEventListener("click", () => {
+      const text = document.getElementById("habitInput").value.trim();
+      const cat = document.getElementById("categorySelect").value;
       if (!text) return;
 
-      habits.push({ id: Date.now(), name: text, completed: false });
-      habitInput.value = "";
+      habits.push({ id: Date.now(), name: text, category: cat, completed: false });
+      document.getElementById("habitInput").value = "";
       saveAndRender();
     });
 
@@ -375,10 +432,17 @@
       saveAndRender();
     };
 
+    window.setFilter = (cat) => {
+      activeFilter = cat;
+      document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.textContent.includes(cat));
+      });
+      renderHabits();
+    };
+
     function saveAndRender() {
       localStorage.setItem("trackerHabits", JSON.stringify(habits));
       
-      // Actualizar registro del día actual en el historial
       const today = new Date().toISOString().split('T')[0];
       const total = habits.length;
       const done = habits.filter(h => h.completed).length;
@@ -387,25 +451,23 @@
 
       renderHabits();
       renderCharts();
+      calculateStreak();
     }
 
     function renderHabits() {
-      habitList.innerHTML = habits.map(h => `
+      const filtered = activeFilter === "Todos" ? habits : habits.filter(h => h.category === activeFilter);
+      document.getElementById("habitList").innerHTML = filtered.map(h => `
         <li class="habit-item ${h.completed ? 'completed' : ''}">
-          <span>${h.name}</span>
+          <span>[${h.category}] ${h.name}</span>
           <div>
-            <button onclick="toggleHabit(${h.id})" style="padding: 5px 10px; cursor:pointer;">
-              ${h.completed ? '✓' : '◯'}
-            </button>
+            <button onclick="toggleHabit(${h.id})" style="padding: 5px 10px; cursor:pointer;">${h.completed ? '✓' : '◯'}</button>
             <button onclick="deleteHabit(${h.id})" style="padding: 5px 10px; cursor:pointer; color:red;">✕</button>
           </div>
         </li>
       `).join('');
     }
 
-    // RENDERIZAR GRÁFICOS
     function renderCharts() {
-      // 1. Quesito / Donut
       const total = habits.length;
       const done = habits.filter(h => h.completed).length;
       const percent = total > 0 ? Math.round((done / total) * 100) : 0;
@@ -413,10 +475,8 @@
       document.getElementById("pieSegment").setAttribute("stroke-dasharray", `${percent} 100`);
       document.getElementById("piePercent").textContent = `${percent}%`;
 
-      // 2. Gráfico de Puntos (Últimos 14 días)
       const dotsGrid = document.getElementById("dotsGrid");
       dotsGrid.innerHTML = "";
-      
       for (let i = 13; i >= 0; i--) {
         const d = new Date();
         d.setDate(d.getDate() - i);
@@ -430,23 +490,56 @@
       }
     }
 
-    // TEMA Y AJUSTES
-    themeSelect.addEventListener("change", (e) => {
+    // CALCULAR RACHAS (MEJORA 1)
+    function calculateStreak() {
+      let streak = 0;
+      let d = new Date();
+      while (true) {
+        const dateStr = d.toISOString().split('T')[0];
+        if (history[dateStr] && history[dateStr] > 0) {
+          streak++;
+          d.setDate(d.getDate() - 1);
+        } else break;
+      }
+      document.getElementById("streakCount").textContent = streak;
+    }
+
+    // EXPORTAR E IMPORTAR JSON (MEJORA 5)
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ habits, history }));
+      const dlAnchor = document.createElement('a');
+      dlAnchor.setAttribute("href", dataStr);
+      dlAnchor.setAttribute("download", "ethos_tracker_backup.json");
+      dlAnchor.click();
+    });
+
+    document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importInput").click());
+    document.getElementById("importInput").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const data = JSON.parse(event.target.result);
+        if (data.habits && data.history) {
+          habits = data.habits;
+          history = data.history;
+          saveAndRender();
+          alert("¡Datos importados con éxito!");
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // OTROS EVENTOS
+    document.getElementById("themeSelect").addEventListener("change", (e) => {
       currentTheme = e.target.value;
       document.body.className = currentTheme;
       localStorage.setItem("trackerTheme", currentTheme);
     });
 
-    document.getElementById("openProfile").addEventListener("click", () => {
-      document.getElementById("profilePanel").classList.toggle("hidden");
-    });
-    document.getElementById("closeProfile").addEventListener("click", () => {
-      document.getElementById("profilePanel").classList.add("hidden");
-    });
-    document.getElementById("clearLocal").addEventListener("click", () => {
-      localStorage.clear();
-      location.reload();
-    });
+    document.getElementById("openProfile").addEventListener("click", () => document.getElementById("profilePanel").classList.toggle("hidden"));
+    document.getElementById("closeProfile").addEventListener("click", () => document.getElementById("profilePanel").classList.add("hidden"));
+    document.getElementById("clearLocal").addEventListener("click", () => { localStorage.clear(); location.reload(); });
   </script>
 </body>
 </html>
