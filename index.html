@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ethos Discipline & Habit Tracker</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Ethos Discipline Tracker</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="theme-default">
+<body class="theme-naranja">
 
-  <!-- MODAL AUTENTICACIÓN -->
+  <!-- AUTH MODAL -->
   <div id="authOverlay" class="auth-overlay">
     <div class="auth-modal">
       <div class="ethos-badge">
@@ -16,18 +16,18 @@
         <span>Ethos Discipline</span>
       </div>
 
-      <h2>INICIAR SESIÓN</h2>
-      <p id="loginQuote" class="auth-subtitle">"Cargando frase..."</p>
+      <h2 style="margin-top:10px; font-size: 20px;">INICIAR SESIÓN</h2>
+      <p id="loginQuote" class="auth-subtitle">Cargando inspiración...</p>
 
       <div id="loginPanel" class="auth-panel">
-        <input type="text" id="loginName" placeholder="Usuario">
+        <input type="email" id="loginEmail" placeholder="Correo Electrónico">
         <input type="password" id="loginPass" placeholder="Contraseña">
         <button id="loginBtn" class="auth-primary">Acceder</button>
       </div>
     </div>
   </div>
 
-  <!-- APLICACIÓN PRINCIPAL -->
+  <!-- MAIN APP -->
   <div class="main-container">
     <header class="header">
       <div class="brand-title">
@@ -38,14 +38,14 @@
     </header>
 
     <div class="motivation-bar">
-      <span id="quoteText" class="quote-text">"El éxito es la suma de pequeños esfuerzos."</span>
+      <span id="quoteText" class="quote-text">Cargando...</span>
       <span class="streak-tag">
-        <span id="streakIcon" class="streak-icon">🔥</span>
-        <span id="streakLabel">Racha:</span> <span id="streakCount">0</span>
+        <span>👑</span>
+        <span>Racha:</span> <span id="streakCount">0</span>
       </span>
     </div>
 
-    <!-- LISTA DE HÁBITOS -->
+    <!-- HABITS -->
     <section class="habits-section">
       <div class="add-habit-box">
         <input type="text" id="habitInput" placeholder="Añadir nuevo hábito...">
@@ -59,18 +59,17 @@
       </div>
 
       <div id="filtersBar" class="filters-bar"></div>
-
       <ul id="habitList" class="habit-list"></ul>
     </section>
 
-    <!-- GRÁFICOS -->
+    <!-- CHARTS -->
     <section class="charts-grid">
       <div class="chart-card">
         <h3>Progreso Hoy</h3>
         <div class="pie-chart-wrapper">
-          <svg width="120" height="120" viewBox="0 0 42 42">
+          <svg width="130" height="130" viewBox="0 0 42 42">
             <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="var(--dot-empty)" stroke-width="5"></circle>
-            <circle id="pieSegment" cx="21" cy="21" r="15.915" fill="transparent" stroke="var(--accent-color)" stroke-width="5" stroke-dasharray="0 100"></circle>
+            <circle id="pieSegment" cx="21" cy="21" r="15.915" fill="transparent" stroke="var(--accent-color)" stroke-width="5" stroke-dasharray="0 100" style="transition: stroke-dasharray 0.5s;"></circle>
           </svg>
           <div id="piePercent" class="pie-center-text">0%</div>
         </div>
@@ -91,25 +90,27 @@
       </div>
     </section>
 
-    <!-- PANEL PERFIL Y AJUSTES -->
+    <!-- SETTINGS PANEL -->
     <aside id="profilePanel" class="profile-panel hidden">
-      <h3>Ajustes de Perfil</h3>
-      <p><strong>Usuario:</strong> <span id="profileName">-</span></p>
-      
-      <label for="themeSelect">Tema Visual:</label>
-      <select id="themeSelect" class="theme-select">
-        <option value="theme-default">Oscuro (Default)</option>
-        <option value="theme-neon">Neón Cyber</option>
-        <option value="theme-light">Claro</option>
-        <option id="goldThemeOption" value="theme-gold" disabled>🔒 Tema Oro (Requiere 365 días)</option>
-      </select>
+      <h3>Ajustes</h3>
+      <p style="font-size: 13px;"><strong>Usuario:</strong> <span id="profileName">-</span></p>
 
-      <button id="exportBtn" class="json-btn">📥 Exportar Datos (JSON)</button>
-      <button id="importBtn" class="json-btn">📤 Importar Datos (JSON)</button>
-      <input type="file" id="importInput" accept=".json" class="hidden">
+      <label style="font-size: 12px; font-weight: bold;">Seleccionar Tema (10):</label>
+      <div class="theme-selector">
+        <div class="theme-dot" style="background: #ff7700;" onclick="setTheme('theme-naranja')" title="Naranja Neón"></div>
+        <div class="theme-dot" style="background: #ffd700;" onclick="setTheme('theme-dorado')" title="Dorado"></div>
+        <div class="theme-dot" style="background: #0088ff;" onclick="setTheme('theme-azul')" title="Azul Neón"></div>
+        <div class="theme-dot" style="background: #00e676;" onclick="setTheme('theme-esmeralda')" title="Esmeralda"></div>
+        <div class="theme-dot" style="background: #b000ff;" onclick="setTheme('theme-purpura')" title="Púrpura"></div>
+        <div class="theme-dot" style="background: #ff2a2a;" onclick="setTheme('theme-rojo')" title="Rojo Carmín"></div>
+        <div class="theme-dot" style="background: #ff007f;" onclick="setTheme('theme-rosa')" title="Rosa Cyberpunk"></div>
+        <div class="theme-dot" style="background: #00d2ff;" onclick="setTheme('theme-plata')" title="Plata"></div>
+        <div class="theme-dot" style="background: #ffffff;" onclick="setTheme('theme-mono')" title="Monocromático"></div>
+        <div class="theme-dot" style="background: linear-gradient(45deg, #ff4500, #ff007f);" onclick="setTheme('theme-atardecer')" title="Atardecer"></div>
+      </div>
 
       <button id="clearLocal" class="theme-btn">Cerrar Sesión</button>
-      <button id="closeProfile" class="theme-btn secondary">Cerrar</button>
+      <button id="closeProfile" class="theme-btn secondary">Cerrar Panel</button>
     </aside>
   </div>
 

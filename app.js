@@ -1,89 +1,105 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { db } from "./firebase-config.js";
+import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDwLTK1bT2nB215W03Ot2N6UxEsLbN36Jk",
-  authDomain: "ethos-brawl-tracker.firebaseapp.com",
-  projectId: "ethos-brawl-tracker",
-  storageBucket: "ethos-brawl-tracker.firebasestorage.app",
-  messagingSenderId: "706650010986",
-  appId: "1:706650010986:web:a36704353f52b094a4e113"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const POP_CULTURE_QUOTES = [
-  "\"Con un gran poder viene una gran responsabilidad.\" — Uncle Ben",
-  "\"No te compares con nadie en este mundo.\" — Bill Gates",
-  "\"El único modo de hacer un gran trabajo es amar lo que haces.\" — Steve Jobs",
-  "\"Caerse está permitido, levantarse es obligatorio.\" — Proverbio Japonés"
-];
-
-const MAIN_QUOTES = [
-  "El éxito es la suma de pequeños esfuerzos repetidos día tras día.",
+// 20 FRASES MOTIVACIONALES
+const MOTIVATIONAL_QUOTES = [
+  "La disciplina es la clave de la libertad personal.",
+  "El éxito no se logra por suerte, sino con consistencia diaria.",
+  "Haz hoy lo que otros no quieren para vivir mañana como otros no pueden.",
+  "Pequeños hábitos diarios generan grandes resultados anuales.",
+  "Tu único límite es la mente que te dice que no puedes.",
   "No cuentes los días, haz que los días cuenten.",
-  "La disciplina es el puente entre tus metas y tus logros."
+  "La constancia vence al talento cuando el talento no se esfuerza.",
+  "El dolor de la disciplina es temporal; el del arrepentimiento es para siempre.",
+  "Construye en silencio y deja que tu éxito haga el ruido.",
+  "La motivación te pone en marcha, el hábito te mantiene creciendo.",
+  "Domina tus hábitos o tus hábitos te dominarán a ti.",
+  "Cada acción que ejecutas es un voto por la persona en la que te convertirás.",
+  "No busques perfección, busca progreso constante.",
+  "El rigor diario supera las ganas pasajeras.",
+  "Si quieres resultados extraordinarios, exige un compromiso diario.",
+  "Tu futuro está oculto en tu rutina diaria.",
+  "Crea el hábito de vencerte a ti mismo cada mañana.",
+  "El enfoque firme crea destinos increíbles.",
+  "La autodisciplina es mostrarte respeto a ti mismo.",
+  "Hoy es otra oportunidad para estar más cerca de tu meta."
 ];
 
 let user = null;
-let habits = JSON.parse(localStorage.getItem("trackerHabits")) || [];
-let history = JSON.parse(localStorage.getItem("trackerHistory")) || {};
-let customCategories = JSON.parse(localStorage.getItem("trackerCategories")) || ["Salud", "Estudio", "Personal"];
-let currentTheme = localStorage.getItem("trackerTheme") || "theme-default";
+let habits = JSON.parse(localStorage.getItem("trackerHabits_v2")) || [];
+let history = JSON.parse(localStorage.getItem("trackerHistory_v2")) || {};
+let customCategories = JSON.parse(localStorage.getItem("trackerCategories_v2")) || ["Salud", "Estudio", "Personal"];
 let activeFilter = "Todos";
 
-document.body.className = currentTheme;
-document.getElementById("themeSelect").value = currentTheme;
-document.getElementById("quoteText").textContent = `"${MAIN_QUOTES[new Date().getDate() % MAIN_QUOTES.length]}"`;
-
-function setDailyLoginQuote() {
-  const today = new Date();
-  const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-  document.getElementById("loginQuote").textContent = POP_CULTURE_QUOTES[seed % POP_CULTURE_QUOTES.length];
+function getRandomQuote() { 
+  return MOTIVATIONAL_QUOTES[Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)]; 
 }
-setDailyLoginQuote();
+
+// Inicialización de Frases y Temas
+document.getElementById("loginQuote").textContent = `"${getRandomQuote()}"`;
+document.getElementById("quoteText").textContent = `"${getRandomQuote()}"`;
+
+const savedTheme = localStorage.getItem("trackerTheme_v2") || "theme-naranja";
+document.body.className = savedTheme;
+
+window.setTheme = (themeClass) => {
+  document.body.className = themeClass;
+  localStorage.setItem("trackerTheme_v2", themeClass);
+};
+
+// Verificación de cambio de día y reset automático de checkboxes
+function checkDailyReset() {
+  const today = new Date().toISOString().split('T')[0];
+  const lastOpened = localStorage.getItem("trackerLastDate_v2");
+
+  if (lastOpened !== today) {
+    habits = habits.map(h => ({ ...h, completed: false }));
+    localStorage.setItem("trackerLastDate_v2", today);
+    localStorage.setItem("trackerHabits_v2", JSON.stringify(habits));
+  }
+}
 
 function checkAuth() {
   if (!user) {
     document.getElementById("authOverlay").classList.remove("hidden");
   } else {
     document.getElementById("authOverlay").classList.add("hidden");
-    document.getElementById("profileName").textContent = user.name;
+    document.getElementById("profileName").textContent = user.email;
+    checkDailyReset();
     renderCategoryOptions();
     saveAndRender();
   }
 }
 
+// Autenticación por correo
 document.getElementById("loginBtn").addEventListener("click", async () => {
-  const name = document.getElementById("loginName").value.trim();
+  const email = document.getElementById("loginEmail").value.trim().toLowerCase();
   const pass = document.getElementById("loginPass").value.trim();
-  if (!name || !pass) return alert("Completa los campos");
+  if (!email || !pass) return alert("Por favor introduce correo y contraseña");
 
-  const ref = doc(db, "users", name);
+  const docId = email.replace(/[^a-zA-Z0-9]/g, "_");
+  const ref = doc(db, "users", docId);
   const snap = await getDoc(ref);
 
   if (snap.exists()) {
-    if (snap.data().password !== pass) {
-      return alert("Contraseña incorrecta");
-    }
+    if (snap.data().password !== pass) return alert("Contraseña incorrecta");
   } else {
-    await setDoc(ref, { password: pass });
+    await setDoc(ref, { email: email, password: pass });
   }
 
-  user = { name };
+  user = { email };
   checkAuth();
 });
 
 const categorySelect = document.getElementById("categorySelect");
 categorySelect.addEventListener("change", (e) => {
   if (e.target.value === "__NEW__") {
-    const newCat = prompt("Introduce el nombre de la nueva categoría:");
+    const newCat = prompt("Nueva categoría:");
     if (newCat && newCat.trim() !== "") {
       const formatted = newCat.trim();
       if (!customCategories.includes(formatted)) {
         customCategories.push(formatted);
-        localStorage.setItem("trackerCategories", JSON.stringify(customCategories));
+        localStorage.setItem("trackerCategories_v2", JSON.stringify(customCategories));
       }
       renderCategoryOptions();
       categorySelect.value = formatted;
@@ -113,7 +129,19 @@ document.getElementById("addHabitBtn").addEventListener("click", () => {
 });
 
 window.toggleHabit = (id) => {
-  habits = habits.map(h => h.id === id ? { ...h, completed: !h.completed } : h);
+  habits = habits.map(h => {
+    if (h.id === id) {
+      const nextState = !h.completed;
+      if (nextState) {
+        setTimeout(() => {
+          const el = document.getElementById(`habit-${id}`);
+          if (el) el.classList.add('just-completed');
+        }, 10);
+      }
+      return { ...h, completed: nextState };
+    }
+    return h;
+  });
   saveAndRender();
 };
 
@@ -129,12 +157,12 @@ window.setFilter = (cat) => {
 };
 
 function saveAndRender() {
-  localStorage.setItem("trackerHabits", JSON.stringify(habits));
+  localStorage.setItem("trackerHabits_v2", JSON.stringify(habits));
   const today = new Date().toISOString().split('T')[0];
   const total = habits.length;
   const done = habits.filter(h => h.completed).length;
   history[today] = total > 0 ? (done / total) : 0;
-  localStorage.setItem("trackerHistory", JSON.stringify(history));
+  localStorage.setItem("trackerHistory_v2", JSON.stringify(history));
 
   renderHabits();
   renderCharts();
@@ -144,11 +172,11 @@ function saveAndRender() {
 function renderHabits() {
   const filtered = activeFilter === "Todos" ? habits : habits.filter(h => h.category === activeFilter);
   document.getElementById("habitList").innerHTML = filtered.map(h => `
-    <li class="habit-item ${h.completed ? 'completed' : ''}">
+    <li id="habit-${h.id}" class="habit-item ${h.completed ? 'completed' : ''}">
       <span>[${h.category}] ${h.name}</span>
       <div>
-        <button onclick="toggleHabit(${h.id})" style="padding:5px 10px; cursor:pointer;">${h.completed ? '✓' : '◯'}</button>
-        <button onclick="deleteHabit(${h.id})" style="padding:5px 10px; cursor:pointer; color:red;">✕</button>
+        <button class="btn-action ${h.completed ? 'check' : ''}" onclick="toggleHabit(${h.id})">${h.completed ? '✓' : '◯'}</button>
+        <button class="btn-action delete" onclick="deleteHabit(${h.id})">✕</button>
       </div>
     </li>
   `).join('');
@@ -172,9 +200,17 @@ function renderCharts() {
 
     const yDot = document.createElement("div");
     let lvl = "";
-    if (dayProgress > 0.8) lvl = "lvl-3";
-    else if (dayProgress > 0.4) lvl = "lvl-2";
-    else if (dayProgress > 0) lvl = "lvl-1";
+    
+    // Regla: Solo pasa a dorado brillante al alcanzar 100% de completado
+    if (dayProgress >= 1) {
+      lvl = "lvl-gold";
+    } else if (dayProgress > 0.6) {
+      lvl = "lvl-3";
+    } else if (dayProgress > 0.3) {
+      lvl = "lvl-2";
+    } else if (dayProgress > 0) {
+      lvl = "lvl-1";
+    }
 
     yDot.className = `year-dot ${lvl}`;
     yDot.title = `${dateStr}: ${Math.round(dayProgress * 100)}%`;
@@ -199,18 +235,7 @@ function calculateStreak() {
   }
 
   document.getElementById("streakCount").textContent = streak;
-  const goldOption = document.getElementById("goldThemeOption");
-  if (streak >= 365) {
-    goldOption.removeAttribute("disabled");
-    goldOption.textContent = "👑 Tema Oro (Desbloqueado)";
-  }
 }
-
-document.getElementById("themeSelect").addEventListener("change", (e) => {
-  currentTheme = e.target.value;
-  document.body.className = currentTheme;
-  localStorage.setItem("trackerTheme", currentTheme);
-});
 
 document.getElementById("openProfile").addEventListener("click", () => document.getElementById("profilePanel").classList.toggle("hidden"));
 document.getElementById("closeProfile").addEventListener("click", () => document.getElementById("profilePanel").classList.add("hidden"));
