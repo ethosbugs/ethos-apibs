@@ -4,7 +4,267 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ethos Discipline Tracker</title>
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* VARIABLES Y 10 TEMAS DE COLOR */
+    :root {
+      --bg-color: #0f0a05;
+      --card-bg: #1c130a;
+      --card-bg-elevated: #281b0e;
+      --text-color: #fff8f2;
+      --text-muted: #d4a373;
+      --accent-color: #ff7700;
+      --accent-glow: rgba(255, 119, 0, 0.4);
+      --border-color: #4a2800;
+      --border-bright: #9e5300;
+      --dot-empty: #261505;
+      --main-gradient: linear-gradient(135deg, #ff9900 0%, #ff5500 100%);
+      
+      --gold-color: #ffd700;
+      --gold-glow: rgba(255, 215, 0, 0.5);
+      --gold-gradient: linear-gradient(135deg, #ffe875 0%, #f7b731 50%, #c88d00 100%);
+    }
+
+    body.theme-naranja { --bg-color: #0f0a05; --card-bg: #1c130a; --card-bg-elevated: #281b0e; --text-color: #fff8f2; --text-muted: #d4a373; --accent-color: #ff7700; --accent-glow: rgba(255, 119, 0, 0.4); --border-color: #4a2800; --border-bright: #9e5300; --dot-empty: #261505; --main-gradient: linear-gradient(135deg, #ff9900 0%, #ff5500 100%); }
+    body.theme-dorado { --bg-color: #0d0b03; --card-bg: #181405; --card-bg-elevated: #221c08; --text-color: #fff9e6; --text-muted: #cbb886; --accent-color: #ffd700; --accent-glow: rgba(255, 215, 0, 0.35); --border-color: #44370f; --border-bright: #8a7122; --dot-empty: #26200a; --main-gradient: linear-gradient(135deg, #ffe875 0%, #f7b731 50%, #c88d00 100%); }
+    body.theme-azul { --bg-color: #030a16; --card-bg: #08142c; --card-bg-elevated: #0f1e3d; --text-color: #e6f2ff; --text-muted: #7fa2c7; --accent-color: #0088ff; --accent-glow: rgba(0, 136, 255, 0.4); --border-color: #0f3460; --border-bright: #1f5f9e; --dot-empty: #0a192f; --main-gradient: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); }
+    body.theme-esmeralda { --bg-color: #02120b; --card-bg: #062417; --card-bg-elevated: #0d3824; --text-color: #e6ffea; --text-muted: #73b88c; --accent-color: #00e676; --accent-glow: rgba(0, 230, 118, 0.4); --border-color: #0a472a; --border-bright: #127546; --dot-empty: #082115; --main-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+    body.theme-purpura { --bg-color: #0d0514; --card-bg: #1a0b29; --card-bg-elevated: #27123d; --text-color: #f7e6ff; --text-muted: #b47fcf; --accent-color: #b000ff; --accent-glow: rgba(176, 0, 255, 0.4); --border-color: #430c5c; --border-bright: #731b9e; --dot-empty: #190826; --main-gradient: linear-gradient(135deg, #ea00d9 0%, #711c91 100%); }
+    body.theme-rojo { --bg-color: #140303; --card-bg: #290808; --card-bg-elevated: #3d0f0f; --text-color: #ffe6e6; --text-muted: #cf7f7f; --accent-color: #ff2a2a; --accent-glow: rgba(255, 42, 42, 0.4); --border-color: #5c0c0c; --border-bright: #9e1b1b; --dot-empty: #260808; --main-gradient: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); }
+    body.theme-rosa { --bg-color: #14030d; --card-bg: #29081a; --card-bg-elevated: #3d0f27; --text-color: #ffe6f4; --text-muted: #cf7fa8; --accent-color: #ff007f; --accent-glow: rgba(255, 0, 127, 0.4); --border-color: #5c0c39; --border-bright: #9e1b64; --dot-empty: #260818; --main-gradient: linear-gradient(135deg, #ff007f 0%, #7f00ff 100%); }
+    body.theme-plata { --bg-color: #0d0f12; --card-bg: #1a1e24; --card-bg-elevated: #282e38; --text-color: #f0f4f8; --text-muted: #9aa5b1; --accent-color: #00d2ff; --accent-glow: rgba(0, 210, 255, 0.3); --border-color: #333e48; --border-bright: #52606d; --dot-empty: #181c20; --main-gradient: linear-gradient(135deg, #e6dada 0%, #274046 100%); }
+    body.theme-mono { --bg-color: #0a0a0a; --card-bg: #141414; --card-bg-elevated: #242424; --text-color: #ffffff; --text-muted: #888888; --accent-color: #ffffff; --accent-glow: rgba(255, 255, 255, 0.3); --border-color: #333333; --border-bright: #666666; --dot-empty: #1c1c1c; --main-gradient: linear-gradient(135deg, #ffffff 0%, #888888 100%); }
+    body.theme-atardecer { --bg-color: #12030f; --card-bg: #21081b; --card-bg-elevated: #330f2b; --text-color: #fff0f5; --text-muted: #d98cb3; --accent-color: #ff4500; --accent-glow: rgba(255, 69, 0, 0.4); --border-color: #570e3c; --border-bright: #8a1760; --dot-empty: #210619; --main-gradient: linear-gradient(135deg, #ff4500 0%, #ff007f 50%, #7f00ff 100%); }
+
+    /* KEYFRAMES ANIMACIONES */
+    @keyframes fadeInApp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes popClick {
+      0% { transform: scale(1); }
+      50% { transform: scale(0.93); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes successCheck {
+      0% { transform: scale(0.8); opacity: 0.5; }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding-bottom: 40px;
+      animation: fadeInApp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .hidden { display: none !important; }
+
+    button, input, select { transition: all 0.2s ease; }
+    button:active { animation: popClick 0.2s ease; }
+
+    /* AUTH MODAL */
+    .auth-overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.88); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center; z-index: 999;
+    }
+
+    .auth-modal {
+      position: relative;
+      background: var(--card-bg);
+      padding: 35px 25px 25px 25px;
+      border-radius: 16px;
+      border: 2px solid var(--border-bright);
+      text-align: center;
+      width: 350px;
+      box-shadow: 0 0 30px var(--accent-glow);
+      animation: fadeInApp 0.4s ease-out;
+    }
+
+    .ethos-badge {
+      position: absolute; top: -14px; left: 20px;
+      background: #000; border: 1px solid var(--accent-color);
+      border-radius: 20px; padding: 4px 12px; display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: bold; color: var(--accent-color);
+    }
+
+    .ethos-icon {
+      width: 16px; height: 16px; background: var(--main-gradient);
+      color: #000; border-radius: 4px; display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 900;
+    }
+
+    .auth-subtitle {
+      font-size: 12px; margin-top: 10px; font-style: italic; color: var(--text-muted);
+      min-height: 40px; display: flex; align-items: center; justify-content: center;
+    }
+
+    .auth-panel { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+    .auth-panel input {
+      padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);
+      background: var(--bg-color); color: var(--text-color); outline: none;
+    }
+    .auth-panel input:focus { border-color: var(--accent-color); box-shadow: 0 0 8px var(--accent-glow); }
+
+    .auth-primary {
+      padding: 12px; background: var(--main-gradient); border: none;
+      font-weight: 800; cursor: pointer; border-radius: 8px; color: #000;
+    }
+    .auth-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px var(--accent-glow); }
+
+    /* LAYOUT PRINCIPAL */
+    .main-container { width: 100%; max-width: 800px; padding: 25px 20px; flex: 1; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    .brand-title { display: flex; align-items: center; gap: 12px; }
+
+    .brand-icon {
+      width: 38px; height: 38px; background: var(--main-gradient);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      color: #000; font-weight: 900; font-size: 20px; box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    h1 {
+      font-size: 22px; letter-spacing: 1px;
+      background: var(--main-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      font-weight: 800;
+    }
+
+    .settings-btn {
+      background: var(--main-gradient); border: none; padding: 10px 18px;
+      border-radius: 8px; cursor: pointer; font-weight: 700; color: #000;
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
+    .settings-btn:hover { transform: translateY(-2px); }
+
+    .motivation-bar {
+      background: var(--card-bg); border: 1px solid var(--border-bright);
+      padding: 16px 20px; border-radius: 14px; margin-bottom: 25px;
+      display: flex; justify-content: space-between; align-items: center; font-size: 14px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .quote-text { font-style: italic; color: var(--text-muted); max-width: 70%; line-height: 1.3; }
+
+    .streak-tag {
+      background: rgba(255, 215, 0, 0.1); border: 1px solid var(--gold-color);
+      color: var(--gold-color); padding: 6px 14px; border-radius: 20px;
+      font-weight: 800; display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 0 12px var(--gold-glow);
+    }
+
+    /* HÁBITOS */
+    .habits-section {
+      background: var(--card-bg); padding: 22px; border-radius: 16px;
+      border: 1px solid var(--border-color); margin-bottom: 25px;
+    }
+
+    .add-habit-box { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+    .add-habit-box input, .add-habit-box select {
+      padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-color);
+      background: var(--bg-color); color: var(--text-color); outline: none;
+    }
+    .add-habit-box input { flex: 2; min-width: 180px; }
+    .add-habit-box input:focus, .add-habit-box select:focus { border-color: var(--accent-color); }
+    .add-habit-box button {
+      padding: 12px 20px; background: var(--main-gradient); border: none;
+      border-radius: 8px; cursor: pointer; font-weight: 800; color: #000;
+    }
+
+    .filters-bar { display: flex; gap: 8px; margin-bottom: 18px; overflow-x: auto; padding-bottom: 4px; }
+    .filter-btn {
+      padding: 6px 16px; background: var(--bg-color); border: 1px solid var(--border-color);
+      color: var(--text-muted); border-radius: 20px; cursor: pointer; font-size: 13px; white-space: nowrap;
+    }
+    .filter-btn.active { background: var(--accent-color); color: #000; font-weight: 700; border-color: var(--accent-color); }
+
+    .habit-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .habit-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 18px; background: var(--card-bg-elevated); border-radius: 10px;
+      border: 1px solid var(--border-color); transition: all 0.2s ease;
+    }
+    .habit-item:hover { border-color: var(--border-bright); transform: translateX(3px); }
+    .habit-item.completed { opacity: 0.6; }
+    .habit-item.completed span { text-decoration: line-through; }
+    .habit-item.just-completed { animation: successCheck 0.4s ease-out; }
+
+    .btn-action {
+      background: transparent; border: 1px solid var(--border-color);
+      color: var(--text-color); padding: 6px 12px; border-radius: 6px;
+      cursor: pointer; font-size: 14px; margin-left: 6px;
+    }
+    .btn-action:hover { background: var(--border-color); }
+    .btn-action.check { color: #4cd137; border-color: #4cd137; }
+    .btn-action.delete { color: #e74c3c; border-color: #e74c3c; }
+
+    /* GRÁFICAS */
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+    @media (max-width: 650px) { .charts-grid { grid-template-columns: 1fr; } }
+
+    .chart-card {
+      background: var(--card-bg); padding: 22px; border-radius: 16px;
+      border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center;
+    }
+    .chart-card.full-width { grid-column: 1 / -1; width: 100%; }
+    .chart-card h3 { margin-bottom: 18px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-color); }
+
+    .pie-chart-wrapper { position: relative; width: 130px; height: 130px; }
+    .pie-chart-wrapper svg { transform: rotate(-90deg); border-radius: 50%; }
+    .pie-center-text {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 20px; color: var(--accent-color);
+    }
+
+    .line-chart-container { width: 100%; height: 120px; }
+    .line-chart-svg { width: 100%; height: 100%; }
+
+    .year-grid-container { width: 100%; overflow-x: auto; padding-bottom: 10px; }
+    .year-grid { display: grid; grid-template-rows: repeat(7, 13px); grid-auto-flow: column; grid-auto-columns: 13px; gap: 4px; }
+    .year-dot { width: 13px; height: 13px; border-radius: 3px; background: var(--dot-empty); transition: all 0.2s; }
+
+    .year-dot.lvl-1 { background: rgba(255, 255, 255, 0.2); }
+    .year-dot.lvl-2 { background: var(--border-bright); }
+    .year-dot.lvl-3 { background: var(--accent-color); box-shadow: 0 0 5px var(--accent-glow); }
+    .year-dot.lvl-gold {
+      background: var(--gold-color) !important;
+      box-shadow: 0 0 8px var(--gold-glow) !important;
+    }
+
+    /* PANEL PERFIL */
+    .profile-panel {
+      position: fixed; top: 70px; right: 20px;
+      background: var(--card-bg); border: 1px solid var(--border-bright);
+      padding: 20px; border-radius: 12px; display: flex; flex-direction: column;
+      gap: 12px; z-index: 100; width: 290px; box-shadow: 0 8px 30px rgba(0,0,0,0.8);
+      animation: fadeInApp 0.3s ease;
+    }
+
+    .theme-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 8px 0; }
+    .theme-dot {
+      width: 100%; height: 26px; border-radius: 6px; cursor: pointer; border: 2px solid transparent;
+    }
+    .theme-dot:hover, .theme-dot.active { border-color: #fff; transform: scale(1.08); }
+
+    .theme-btn { padding: 10px; background: var(--main-gradient); border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: #000; }
+    .theme-btn.secondary { background: var(--border-color); color: var(--text-color); }
+
+    .creators-footer {
+      text-align: center; padding: 20px; font-size: 12px;
+      color: var(--text-muted); border-top: 1px solid var(--border-color);
+      width: 100%; margin-top: auto;
+    }
+  </style>
 </head>
 <body class="theme-naranja">
 
@@ -118,6 +378,254 @@
     Ethos Habit Tracker • Creadores de páginas webs
   </footer>
 
-  <script type="module" src="app.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDwLTK1bT2nB215W03Ot2N6UxEsLbN36Jk",
+      authDomain: "ethos-brawl-tracker.firebaseapp.com",
+      projectId: "ethos-brawl-tracker",
+      storageBucket: "ethos-brawl-tracker.firebasestorage.app",
+      messagingSenderId: "706650010986",
+      appId: "1:706650010986:web:a36704353f52b094a4e113"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const MOTIVATIONAL_QUOTES = [
+      "La disciplina es la clave de la libertad personal.",
+      "El éxito no se logra por suerte, sino con consistencia diaria.",
+      "Haz hoy lo que otros no quieren para vivir mañana como otros no pueden.",
+      "Pequeños hábitos diarios generan grandes resultados anuales.",
+      "Tu único límite es la mente que te dice que no puedes.",
+      "No cuentes los días, haz que los días cuenten.",
+      "La constancia vence al talento cuando el talento no se esfuerza.",
+      "El dolor de la disciplina es temporal; el del arrepentimiento es para siempre.",
+      "Construye en silencio y deja que tu éxito haga el ruido.",
+      "La motivación te pone en marcha, el hábito te mantiene creciendo.",
+      "Domina tus hábitos o tus hábitos te dominarán a ti.",
+      "Cada acción que ejecutas es un voto por la persona en la que te convertirás.",
+      "No busques perfección, busca progreso constante.",
+      "El rigor diario supera las ganas pasajeras.",
+      "Si quieres resultados extraordinarios, exige un compromiso diario.",
+      "Tu futuro está oculto en tu rutina diaria.",
+      "Crea el hábito de vencerte a ti mismo cada mañana.",
+      "El enfoque firme crea destinos increíbles.",
+      "La autodisciplina es mostrarte respeto a ti mismo.",
+      "Hoy es otra oportunidad para estar más cerca de tu meta."
+    ];
+
+    let user = null;
+    let habits = JSON.parse(localStorage.getItem("trackerHabits_v2")) || [];
+    let history = JSON.parse(localStorage.getItem("trackerHistory_v2")) || {};
+    let customCategories = JSON.parse(localStorage.getItem("trackerCategories_v2")) || ["Salud", "Estudio", "Personal"];
+    let activeFilter = "Todos";
+
+    function getRandomQuote() { return MOTIVATIONAL_QUOTES[Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)]; }
+
+    document.getElementById("loginQuote").textContent = `"${getRandomQuote()}"`;
+    document.getElementById("quoteText").textContent = `"${getRandomQuote()}"`;
+
+    const savedTheme = localStorage.getItem("trackerTheme_v2") || "theme-naranja";
+    document.body.className = savedTheme;
+
+    window.setTheme = (themeClass) => {
+      document.body.className = themeClass;
+      localStorage.setItem("trackerTheme_v2", themeClass);
+    };
+
+    function checkDailyReset() {
+      const today = new Date().toISOString().split('T')[0];
+      const lastOpened = localStorage.getItem("trackerLastDate_v2");
+
+      if (lastOpened !== today) {
+        habits = habits.map(h => ({ ...h, completed: false }));
+        localStorage.setItem("trackerLastDate_v2", today);
+        localStorage.setItem("trackerHabits_v2", JSON.stringify(habits));
+      }
+    }
+
+    function checkAuth() {
+      if (!user) {
+        document.getElementById("authOverlay").classList.remove("hidden");
+      } else {
+        document.getElementById("authOverlay").classList.add("hidden");
+        document.getElementById("profileName").textContent = user.email;
+        checkDailyReset();
+        renderCategoryOptions();
+        saveAndRender();
+      }
+    }
+
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+      const pass = document.getElementById("loginPass").value.trim();
+      if (!email || !pass) return alert("Por favor introduce correo y contraseña");
+
+      const docId = email.replace(/[^a-zA-Z0-9]/g, "_");
+      const ref = doc(db, "users", docId);
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        if (snap.data().password !== pass) return alert("Contraseña incorrecta");
+      } else {
+        await setDoc(ref, { email: email, password: pass });
+      }
+
+      user = { email };
+      checkAuth();
+    });
+
+    const categorySelect = document.getElementById("categorySelect");
+    categorySelect.addEventListener("change", (e) => {
+      if (e.target.value === "__NEW__") {
+        const newCat = prompt("Nueva categoría:");
+        if (newCat && newCat.trim() !== "") {
+          const formatted = newCat.trim();
+          if (!customCategories.includes(formatted)) {
+            customCategories.push(formatted);
+            localStorage.setItem("trackerCategories_v2", JSON.stringify(customCategories));
+          }
+          renderCategoryOptions();
+          categorySelect.value = formatted;
+        } else {
+          categorySelect.value = customCategories[0] || "Personal";
+        }
+      }
+    });
+
+    function renderCategoryOptions() {
+      categorySelect.innerHTML = customCategories.map(c => `<option value="${c}">${c}</option>`).join('') +
+        `<option value="__NEW__">+ Nueva categoría...</option>`;
+
+      const filtersBar = document.getElementById("filtersBar");
+      filtersBar.innerHTML = `<button class="filter-btn ${activeFilter === 'Todos' ? 'active' : ''}" onclick="setFilter('Todos')">Todos</button>` +
+        customCategories.map(c => `<button class="filter-btn ${activeFilter === c ? 'active' : ''}" onclick="setFilter('${c}')">${c}</button>`).join('');
+    }
+
+    document.getElementById("addHabitBtn").addEventListener("click", () => {
+      const text = document.getElementById("habitInput").value.trim();
+      const cat = categorySelect.value;
+      if (!text || cat === "__NEW__") return;
+
+      habits.push({ id: Date.now(), name: text, category: cat, completed: false });
+      document.getElementById("habitInput").value = "";
+      saveAndRender();
+    });
+
+    window.toggleHabit = (id) => {
+      habits = habits.map(h => {
+        if (h.id === id) {
+          const nextState = !h.completed;
+          if (nextState) {
+            setTimeout(() => {
+              const el = document.getElementById(`habit-${id}`);
+              if (el) el.classList.add('just-completed');
+            }, 10);
+          }
+          return { ...h, completed: nextState };
+        }
+        return h;
+      });
+      saveAndRender();
+    };
+
+    window.deleteHabit = (id) => {
+      habits = habits.filter(h => h.id !== id);
+      saveAndRender();
+    };
+
+    window.setFilter = (cat) => {
+      activeFilter = cat;
+      renderCategoryOptions();
+      renderHabits();
+    };
+
+    function saveAndRender() {
+      localStorage.setItem("trackerHabits_v2", JSON.stringify(habits));
+      const today = new Date().toISOString().split('T')[0];
+      const total = habits.length;
+      const done = habits.filter(h => h.completed).length;
+      history[today] = total > 0 ? (done / total) : 0;
+      localStorage.setItem("trackerHistory_v2", JSON.stringify(history));
+
+      renderHabits();
+      renderCharts();
+      calculateStreak();
+    }
+
+    function renderHabits() {
+      const filtered = activeFilter === "Todos" ? habits : habits.filter(h => h.category === activeFilter);
+      document.getElementById("habitList").innerHTML = filtered.map(h => `
+        <li id="habit-${h.id}" class="habit-item ${h.completed ? 'completed' : ''}">
+          <span>[${h.category}] ${h.name}</span>
+          <div>
+            <button class="btn-action ${h.completed ? 'check' : ''}" onclick="toggleHabit(${h.id})">${h.completed ? '✓' : '◯'}</button>
+            <button class="btn-action delete" onclick="deleteHabit(${h.id})">✕</button>
+          </div>
+        </li>
+      `).join('');
+    }
+
+    function renderCharts() {
+      const total = habits.length;
+      const done = habits.filter(h => h.completed).length;
+      const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+
+      document.getElementById("pieSegment").setAttribute("stroke-dasharray", `${percent} 100`);
+      document.getElementById("piePercent").textContent = `${percent}%`;
+
+      const yearGrid = document.getElementById("yearGrid");
+      yearGrid.innerHTML = "";
+      for (let i = 364; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        const dayProgress = history[dateStr] || 0;
+
+        const yDot = document.createElement("div");
+        let lvl = "";
+        
+        if (dayProgress >= 1) {
+          lvl = "lvl-gold";
+        } else if (dayProgress > 0.6) {
+          lvl = "lvl-3";
+        } else if (dayProgress > 0.3) {
+          lvl = "lvl-2";
+        } else if (dayProgress > 0) {
+          lvl = "lvl-1";
+        }
+
+        yDot.className = `year-dot ${lvl}`;
+        yDot.title = `${dateStr}: ${Math.round(dayProgress * 100)}%`;
+        yearGrid.appendChild(yDot);
+      }
+    }
+
+    function calculateStreak() {
+      const today = new Date().toISOString().split('T')[0];
+      const todayDone = history[today] && history[today] > 0;
+      let streak = 0;
+      let d = new Date();
+
+      if (!todayDone) d.setDate(d.getDate() - 1);
+
+      while (true) {
+        const dateStr = d.toISOString().split('T')[0];
+        if (history[dateStr] && history[dateStr] > 0) {
+          streak++;
+          d.setDate(d.getDate() - 1);
+        } else break;
+      }
+
+      document.getElementById("streakCount").textContent = streak;
+    }
+
+    document.getElementById("openProfile").addEventListener("click", () => document.getElementById("profilePanel").classList.toggle("hidden"));
+    document.getElementById("closeProfile").addEventListener("click", () => document.getElementById("profilePanel").classList.add("hidden"));
+    document.getElementById("clearLocal").addEventListener("click", () => { localStorage.clear(); location.reload(); });
+  </script>
 </body>
 </html>
