@@ -34,28 +34,21 @@
     body.theme-mono { --bg-color: #0a0a0a; --card-bg: #141414; --card-bg-elevated: #242424; --text-color: #ffffff; --text-muted: #888888; --accent-color: #ffffff; --accent-glow: rgba(255, 255, 255, 0.3); --border-color: #333333; --border-bright: #666666; --dot-empty: #1c1c1c; --main-gradient: linear-gradient(135deg, #ffffff 0%, #888888 100%); }
     body.theme-atardecer { --bg-color: #12030f; --card-bg: #21081b; --card-bg-elevated: #330f2b; --text-color: #fff0f5; --text-muted: #d98cb3; --accent-color: #ff4500; --accent-glow: rgba(255, 69, 0, 0.4); --border-color: #570e3c; --border-bright: #8a1760; --dot-empty: #210619; --main-gradient: linear-gradient(135deg, #ff4500 0%, #ff007f 50%, #7f00ff 100%); }
 
-    /* ANIMACIONES */
-    @keyframes fadeInApp {
-      from { opacity: 0; transform: translateY(18px) scale(0.98); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+    /* ANIMACIONES DEL FUEGO REALISTA Y FLUIDO */
+    @keyframes flameOuter {
+      0% { transform: scale(1) rotate(-1deg); }
+      50% { transform: scale(1.08, 1.12) rotate(2deg); }
+      100% { transform: scale(0.96, 0.98) rotate(-2deg); }
     }
-
-    @keyframes popClick {
+    @keyframes flameMid {
+      0% { transform: scale(1) rotate(2deg); }
+      50% { transform: scale(1.1, 1.05) rotate(-1deg); }
+      100% { transform: scale(0.95, 1.02) rotate(1deg); }
+    }
+    @keyframes flameInner {
       0% { transform: scale(1); }
-      50% { transform: scale(0.92); }
-      100% { transform: scale(1); }
-    }
-
-    @keyframes successCheck {
-      0% { transform: scale(0.85); opacity: 0.5; }
-      50% { transform: scale(1.18); }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    @keyframes flameFlicker {
-      0% { transform: scale(0.94) rotate(-2deg); }
-      50% { transform: scale(1.08) rotate(2deg); }
-      100% { transform: scale(0.96) rotate(-1deg); }
+      50% { transform: scale(1.15, 1.2); }
+      100% { transform: scale(0.9); }
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
@@ -68,14 +61,10 @@
       align-items: center;
       min-height: 100vh;
       padding-bottom: 40px;
-      animation: fadeInApp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-      transition: background 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease;
+      transition: background 0.4s ease, color 0.4s ease;
     }
 
     .hidden { display: none !important; }
-
-    button, input, select { transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
-    button:active { animation: popClick 0.2s ease; }
 
     /* AUTH MODAL */
     .auth-overlay {
@@ -85,28 +74,22 @@
     }
 
     .auth-modal {
-      position: relative;
-      background: var(--card-bg);
-      padding: 35px 25px 25px 25px;
-      border-radius: 16px;
-      border: 2px solid var(--border-bright);
-      text-align: center;
-      width: 350px;
-      box-shadow: 0 0 35px var(--accent-glow);
-      animation: fadeInApp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative; background: var(--card-bg); padding: 35px 25px;
+      border-radius: 16px; border: 2px solid var(--border-bright); text-align: center;
+      width: 350px; box-shadow: 0 0 35px var(--accent-glow);
     }
 
     .ethos-badge {
-      position: absolute; top: -14px; left: 20px;
-      background: #000; border: 1px solid var(--accent-color);
-      border-radius: 20px; padding: 4px 12px; display: flex; align-items: center; gap: 6px;
+      position: absolute; top: -14px; left: 20px; background: #000;
+      border: 1px solid var(--accent-color); border-radius: 20px;
+      padding: 4px 12px; display: flex; align-items: center; gap: 6px;
       font-size: 11px; font-weight: bold; color: var(--accent-color);
     }
 
     .ethos-icon {
       width: 16px; height: 16px; background: var(--main-gradient);
-      color: #000; border-radius: 4px; display: flex; align-items: center; justify-content: center;
-      font-size: 10px; font-weight: 900;
+      color: #000; border-radius: 4px; display: flex; align-items: center;
+      justify-content: center; font-size: 10px; font-weight: 900;
     }
 
     .auth-subtitle {
@@ -119,13 +102,11 @@
       padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);
       background: var(--bg-color); color: var(--text-color); outline: none;
     }
-    .auth-panel input:focus { border-color: var(--accent-color); box-shadow: 0 0 10px var(--accent-glow); }
 
     .auth-primary {
       padding: 12px; background: var(--main-gradient); border: none;
       font-weight: 800; cursor: pointer; border-radius: 8px; color: #000;
     }
-    .auth-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--accent-glow); }
 
     /* LAYOUT PRINCIPAL */
     .main-container { width: 100%; max-width: 800px; padding: 25px 20px; flex: 1; }
@@ -147,64 +128,69 @@
     .settings-btn {
       background: var(--main-gradient); border: none; padding: 10px 18px;
       border-radius: 8px; cursor: pointer; font-weight: 700; color: #000;
-      box-shadow: 0 4px 15px var(--accent-glow);
     }
-    .settings-btn:hover { transform: translateY(-2px) scale(1.03); }
 
     .motivation-bar {
       background: var(--card-bg); border: 1px solid var(--border-bright);
       padding: 16px 20px; border-radius: 14px; margin-bottom: 25px;
       display: flex; justify-content: space-between; align-items: center; font-size: 14px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-      transition: border-color 0.3s ease;
     }
 
     .quote-text { font-style: italic; color: var(--text-muted); max-width: 65%; line-height: 1.3; }
 
-    /* ESTILOS Y EVOLUCIÓN DE RACHA POR NIVELES DE COLOR */
+    /* FUEGO REALISTA SVG MULTICAPA */
     .streak-tag {
       padding: 6px 14px; border-radius: 20px; font-weight: 800;
-      display: flex; align-items: center; gap: 8px;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex; align-items: center; gap: 8px; transition: all 0.3s;
     }
-    .streak-tag:hover { transform: scale(1.06); }
 
-    .flame-container { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; }
-    .flame-svg { width: 100%; height: 100%; transform-origin: bottom center; animation: flameFlicker 0.8s ease-in-out infinite alternate; }
+    .flame-container { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 26px; }
+    .flame-svg { width: 100%; height: 100%; overflow: visible; }
+    
+    .flame-layer-outer { transform-origin: bottom center; animation: flameOuter 0.6s infinite alternate ease-in-out; }
+    .flame-layer-mid { transform-origin: bottom center; animation: flameMid 0.45s infinite alternate ease-in-out; }
+    .flame-layer-inner { transform-origin: bottom center; animation: flameInner 0.3s infinite alternate ease-in-out; }
 
-    /* GRIS: Racha inactiva */
-    .streak-grey { background: rgba(150, 150, 150, 0.1); border: 1px solid #777; color: #aaa; box-shadow: 0 0 8px rgba(150,150,150,0.2); }
-    .streak-grey .flame-svg path { fill: #888; }
+    /* COLORES DE RACHA */
+    .streak-grey { background: rgba(150, 150, 150, 0.1); border: 1px solid #777; color: #aaa; }
+    .streak-grey .flame-layer-outer { fill: #555; }
+    .streak-grey .flame-layer-mid { fill: #777; }
+    .streak-grey .flame-layer-inner { fill: #aaa; }
 
-    /* NARANJA: 1 a 9 días */
-    .streak-orange { background: rgba(255, 119, 0, 0.15); border: 1px solid #ff7700; color: #ff7700; box-shadow: 0 0 12px rgba(255, 119, 0, 0.4); }
-    .streak-orange .flame-svg path { fill: #ff7700; }
+    .streak-orange { background: rgba(255, 119, 0, 0.15); border: 1px solid #ff7700; color: #ff7700; }
+    .streak-orange .flame-layer-outer { fill: #ff3300; }
+    .streak-orange .flame-layer-mid { fill: #ff7700; }
+    .streak-orange .flame-layer-inner { fill: #ffcc00; }
 
-    /* ROJO: 10 a 29 días */
-    .streak-red { background: rgba(255, 42, 42, 0.15); border: 1px solid #ff2a2a; color: #ff2a2a; box-shadow: 0 0 12px rgba(255, 42, 42, 0.4); }
-    .streak-red .flame-svg path { fill: #ff2a2a; }
+    .streak-red { background: rgba(255, 42, 42, 0.15); border: 1px solid #ff2a2a; color: #ff2a2a; }
+    .streak-red .flame-layer-outer { fill: #990000; }
+    .streak-red .flame-layer-mid { fill: #ff2a2a; }
+    .streak-red .flame-layer-inner { fill: #ff9999; }
 
-    /* AZUL: 30 a 49 días */
-    .streak-blue { background: rgba(0, 136, 255, 0.15); border: 1px solid #0088ff; color: #0088ff; box-shadow: 0 0 12px rgba(0, 136, 255, 0.4); }
-    .streak-blue .flame-svg path { fill: #0088ff; }
+    .streak-blue { background: rgba(0, 136, 255, 0.15); border: 1px solid #0088ff; color: #0088ff; }
+    .streak-blue .flame-layer-outer { fill: #003399; }
+    .streak-blue .flame-layer-mid { fill: #0088ff; }
+    .streak-blue .flame-layer-inner { fill: #99ccff; }
 
-    /* VERDE: 50 a 99 días */
-    .streak-green { background: rgba(0, 230, 118, 0.15); border: 1px solid #00e676; color: #00e676; box-shadow: 0 0 12px rgba(0, 230, 118, 0.4); }
-    .streak-green .flame-svg path { fill: #00e676; }
+    .streak-green { background: rgba(0, 230, 118, 0.15); border: 1px solid #00e676; color: #00e676; }
+    .streak-green .flame-layer-outer { fill: #006633; }
+    .streak-green .flame-layer-mid { fill: #00e676; }
+    .streak-green .flame-layer-inner { fill: #b3ffcc; }
 
-    /* MORADO CON TONOS DORADOS: 100 a 364 días */
-    .streak-purple-gold { background: rgba(176, 0, 255, 0.15); border: 1px solid #b000ff; color: #ffd700; box-shadow: 0 0 14px rgba(176, 0, 255, 0.5); }
-    .streak-purple-gold .flame-svg path { fill: url(#flamePurpleGold); }
+    .streak-purple-gold { background: rgba(176, 0, 255, 0.15); border: 1px solid #b000ff; color: #ffd700; }
+    .streak-purple-gold .flame-layer-outer { fill: #550088; }
+    .streak-purple-gold .flame-layer-mid { fill: #b000ff; }
+    .streak-purple-gold .flame-layer-inner { fill: #ffd700; }
 
-    /* DORADO: 365+ días */
-    .streak-gold { background: rgba(255, 215, 0, 0.2); border: 1px solid #ffd700; color: #ffd700; box-shadow: 0 0 18px rgba(255, 215, 0, 0.6); }
-    .streak-gold .flame-svg path { fill: url(#flameGold365); }
+    .streak-gold { background: rgba(255, 215, 0, 0.2); border: 1px solid #ffd700; color: #ffd700; }
+    .streak-gold .flame-layer-outer { fill: #cc8800; }
+    .streak-gold .flame-layer-mid { fill: #ffd700; }
+    .streak-gold .flame-layer-inner { fill: #ffffff; }
 
-    /* HÁBITOS */
+    /* HÁBITOS REFORMATEADOS */
     .habits-section {
       background: var(--card-bg); padding: 22px; border-radius: 16px;
       border: 1px solid var(--border-color); margin-bottom: 25px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
     }
 
     .add-habit-box { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
@@ -213,37 +199,42 @@
       background: var(--bg-color); color: var(--text-color); outline: none;
     }
     .add-habit-box input { flex: 2; min-width: 180px; }
-    .add-habit-box input:focus, .add-habit-box select:focus { border-color: var(--accent-color); box-shadow: 0 0 8px var(--accent-glow); }
     .add-habit-box button {
       padding: 12px 20px; background: var(--main-gradient); border: none;
       border-radius: 8px; cursor: pointer; font-weight: 800; color: #000;
     }
-    .add-habit-box button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px var(--accent-glow); }
 
     .filters-bar { display: flex; gap: 8px; margin-bottom: 18px; overflow-x: auto; padding-bottom: 4px; }
     .filter-btn {
       padding: 6px 16px; background: var(--bg-color); border: 1px solid var(--border-color);
-      color: var(--text-muted); border-radius: 20px; cursor: pointer; font-size: 13px; white-space: nowrap;
+      color: var(--text-muted); border-radius: 20px; cursor: pointer; font-size: 13px;
     }
     .filter-btn.active { background: var(--accent-color); color: #000; font-weight: 700; border-color: var(--accent-color); }
 
     .habit-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    
+    /* TARJETA DE HÁBITO CON FONDO VERDE AL COMPLETAR Y CATEGORÍA ABAJO */
     .habit-item {
       display: flex; justify-content: space-between; align-items: center;
       padding: 14px 18px; background: var(--card-bg-elevated); border-radius: 10px;
-      border: 1px solid var(--border-color); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid var(--border-color); transition: all 0.3s ease;
     }
-    .habit-item:hover { border-color: var(--border-bright); transform: translateX(4px); }
-    .habit-item.completed { opacity: 0.55; }
-    .habit-item.completed span { text-decoration: line-through; }
-    .habit-item.just-completed { animation: successCheck 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .habit-item.completed {
+      background: rgba(76, 209, 55, 0.15) !important;
+      border-color: #4cd137 !important;
+      box-shadow: 0 0 10px rgba(76, 209, 55, 0.2);
+    }
+    .habit-item.completed .habit-title { text-decoration: line-through; opacity: 0.8; }
+
+    .habit-details { display: flex; flex-direction: column; gap: 3px; }
+    .habit-title { font-size: 15px; font-weight: 600; color: var(--text-color); }
+    .habit-category-subtitle { font-size: 12px; font-weight: 700; color: var(--accent-color); }
 
     .btn-action {
       background: transparent; border: 1px solid var(--border-color);
       color: var(--text-color); padding: 6px 12px; border-radius: 6px;
       cursor: pointer; font-size: 14px; margin-left: 6px;
     }
-    .btn-action:hover { background: var(--border-color); transform: scale(1.05); }
     .btn-action.check { color: #4cd137; border-color: #4cd137; }
     .btn-action.delete { color: #e74c3c; border-color: #e74c3c; }
 
@@ -254,11 +245,9 @@
     .chart-card {
       background: var(--card-bg); padding: 22px; border-radius: 16px;
       border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center;
-      transition: all 0.3s ease;
     }
-    .chart-card:hover { border-color: var(--border-bright); transform: translateY(-2px); }
     .chart-card.full-width { grid-column: 1 / -1; width: 100%; }
-    .chart-card h3 { margin-bottom: 18px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-color); }
+    .chart-card h3 { margin-bottom: 18px; font-size: 13px; text-transform: uppercase; color: var(--accent-color); }
 
     .pie-chart-wrapper { position: relative; width: 130px; height: 130px; }
     .pie-chart-wrapper svg { transform: rotate(-90deg); border-radius: 50%; }
@@ -268,69 +257,38 @@
       font-weight: 800; font-size: 20px; color: var(--accent-color);
     }
 
+    /* GRÁFICA DE PUNTOS MENSUAL SVG */
+    .line-chart-container { width: 100%; height: 130px; display: flex; align-items: center; justify-content: center; }
+    .line-chart-svg { width: 100%; height: 100%; overflow: visible; }
+
     .year-grid-container { width: 100%; overflow-x: auto; padding-bottom: 10px; }
     .year-grid { display: grid; grid-template-rows: repeat(7, 13px); grid-auto-flow: column; grid-auto-columns: 13px; gap: 4px; }
-    .year-dot {
-      width: 13px; height: 13px; border-radius: 3px; background: var(--dot-empty);
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s;
-    }
-    .year-dot:hover { transform: scale(1.6); z-index: 5; cursor: pointer; }
-
+    .year-dot { width: 13px; height: 13px; border-radius: 3px; background: var(--dot-empty); }
     .year-dot.lvl-1 { background: rgba(255, 255, 255, 0.2); }
     .year-dot.lvl-2 { background: var(--border-bright); }
-    .year-dot.lvl-3 { background: var(--accent-color); box-shadow: 0 0 6px var(--accent-glow); }
-    .year-dot.lvl-gold {
-      background: var(--gold-color) !important;
-      box-shadow: 0 0 8px var(--gold-glow) !important;
-    }
+    .year-dot.lvl-3 { background: var(--accent-color); }
+    .year-dot.lvl-gold { background: var(--gold-color) !important; }
 
-    /* PANEL PERFIL & AJUSTES */
+    /* PANEL AJUSTES */
     .profile-panel {
-      position: fixed; top: 70px; right: 20px;
-      background: var(--card-bg); border: 1px solid var(--border-bright);
-      padding: 20px; border-radius: 12px; display: flex; flex-direction: column;
-      gap: 12px; z-index: 100; width: 310px; box-shadow: 0 8px 30px rgba(0,0,0,0.8);
-      animation: fadeInApp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: fixed; top: 70px; right: 20px; background: var(--card-bg);
+      border: 1px solid var(--border-bright); padding: 20px; border-radius: 12px;
+      display: flex; flex-direction: column; gap: 12px; z-index: 100; width: 310px;
     }
 
-    .theme-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 6px 0; }
-    .theme-dot {
-      width: 100%; height: 26px; border-radius: 6px; cursor: pointer; border: 2px solid transparent;
-      display: flex; align-items: center; justify-content: center; font-size: 10px; transition: transform 0.2s ease;
-    }
-    .theme-dot:hover, .theme-dot.active { border-color: #fff; transform: scale(1.1); }
-    .theme-dot.locked { cursor: not-allowed; opacity: 0.6; filter: grayscale(0.5); }
+    .theme-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .theme-dot { width: 100%; height: 26px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+    .theme-dot.locked { cursor: not-allowed; opacity: 0.5; }
 
-    .json-actions { display: flex; gap: 8px; margin-top: 4px; }
-    
+    .json-actions { display: flex; gap: 8px; }
     .theme-btn { padding: 10px; background: var(--main-gradient); border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: #000; width: 100%; }
     .theme-btn.secondary { background: var(--border-color); color: var(--text-color); }
     .theme-btn.accent { background: #0088ff; color: #fff; }
 
-    .creators-footer {
-      text-align: center; padding: 20px; font-size: 12px;
-      color: var(--text-muted); border-top: 1px solid var(--border-color);
-      width: 100%; margin-top: auto;
-    }
+    .creators-footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border-color); width: 100%; }
   </style>
 </head>
 <body class="theme-naranja">
-
-  <!-- GRADIENTES ESPECIALES SVG PARA RACHA -->
-  <svg style="width:0;height:0;position:absolute;">
-    <defs>
-      <linearGradient id="flamePurpleGold" x1="0%" y1="100%" x2="0%" y2="0%">
-        <stop offset="0%" stop-color="#b000ff"/>
-        <stop offset="50%" stop-color="#ea00d9"/>
-        <stop offset="100%" stop-color="#ffd700"/>
-      </linearGradient>
-      <linearGradient id="flameGold365" x1="0%" y1="100%" x2="0%" y2="0%">
-        <stop offset="0%" stop-color="#c88d00"/>
-        <stop offset="50%" stop-color="#f7b731"/>
-        <stop offset="100%" stop-color="#ffe875"/>
-      </linearGradient>
-    </defs>
-  </svg>
 
   <!-- AUTH MODAL -->
   <div id="authOverlay" class="auth-overlay">
@@ -339,10 +297,8 @@
         <div class="ethos-icon">E</div>
         <span>Ethos Discipline</span>
       </div>
-
       <h2 style="margin-top:10px; font-size: 20px;">INICIAR SESIÓN</h2>
-      <p id="loginQuote" class="auth-subtitle">Cargando inspiración...</p>
-
+      <p id="loginQuote" class="auth-subtitle">Cargando...</p>
       <div id="loginPanel" class="auth-panel">
         <input type="email" id="loginEmail" placeholder="Correo Electrónico">
         <input type="password" id="loginPass" placeholder="Contraseña">
@@ -351,7 +307,6 @@
     </div>
   </div>
 
-  <!-- MAIN APP -->
   <div class="main-container">
     <header class="header">
       <div class="brand-title">
@@ -365,9 +320,13 @@
       <span id="quoteText" class="quote-text">Cargando...</span>
       <div id="streakContainer" class="streak-tag streak-grey">
         <div class="flame-container">
-          <svg class="flame-svg" viewBox="0 0 24 24">
-            <path d="M12,2C11.5,5 9,7.5 9,10C9,12.2 10.8,14 13,14 C15.2,14 17,12.2 17,10 C17,5.5 12,2 12,2Z"/>
-            <path d="M12,22C16.4,22 20,18.4 20,14C20,10.2 17.3,7 13.8,6.2C14.5,8 14,9.8 12.8,11C11.3,12.5 10,12 9,14C8,15.5 8.5,18 10,20C8.5,19.5 7.5,18 7.5,16.5C5.4,18.3 5,21.3 8,22H12Z"/>
+          <svg class="flame-svg" viewBox="0 0 50 65">
+            <!-- Capa Exterior del Fuego -->
+            <path class="flame-layer-outer" d="M25,5 C32,18 45,28 45,43 C45,55 36,63 25,63 C14,63 5,55 5,43 C5,28 18,18 25,5 Z"/>
+            <!-- Capa Intermedia -->
+            <path class="flame-layer-mid" d="M25,18 C30,27 38,34 38,45 C38,53 32,58 25,58 C18,58 12,53 12,45 C12,34 20,27 25,18 Z"/>
+            <!-- Núcleo Brillante -->
+            <path class="flame-layer-inner" d="M25,32 C28,37 31,41 31,48 C31,52 28,55 25,55 C22,55 19,52 19,48 C19,41 22,37 25,32 Z"/>
           </svg>
         </div>
         <span>Racha:</span> <span id="streakCount">0</span>
@@ -398,9 +357,16 @@
         <div class="pie-chart-wrapper">
           <svg width="130" height="130" viewBox="0 0 42 42">
             <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="var(--dot-empty)" stroke-width="5"></circle>
-            <circle id="pieSegment" cx="21" cy="21" r="15.915" fill="transparent" stroke="var(--accent-color)" stroke-width="5" stroke-dasharray="0 100" style="transition: stroke-dasharray 0.6s cubic-bezier(0.16, 1, 0.3, 1);"></circle>
+            <circle id="pieSegment" cx="21" cy="21" r="15.915" fill="transparent" stroke="var(--accent-color)" stroke-width="5" stroke-dasharray="0 100" style="transition: stroke-dasharray 0.5s ease;"></circle>
           </svg>
           <div id="piePercent" class="pie-center-text">0%</div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3>Rendimiento Mensual (30 Días)</h3>
+        <div class="line-chart-container">
+          <svg id="monthlyLineChart" class="line-chart-svg" viewBox="0 0 300 100" preserveAspectRatio="none"></svg>
         </div>
       </div>
 
@@ -470,12 +436,7 @@
       "El éxito no se logra por suerte, sino con consistencia diaria.",
       "Haz hoy lo que otros no quieren para vivir mañana como otros no pueden.",
       "Pequeños hábitos diarios generan grandes resultados anuales.",
-      "Tu único límite es la mente que te dice que no puedes.",
-      "No cuentes los días, haz que los días cuenten.",
-      "La constancia vence al talento cuando el talento no se esfuerza.",
-      "El dolor de la disciplina es temporal; el del arrepentimiento es para siempre.",
-      "Construye en silencio y deja que tu éxito haga el ruido.",
-      "La motivación te pone en marcha, el hábito te mantiene creciendo."
+      "Tu único límite es la mente que te dice que no puedes."
     ];
 
     let user = null;
@@ -582,19 +543,7 @@
     });
 
     window.toggleHabit = (id) => {
-      habits = habits.map(h => {
-        if (h.id === id) {
-          const nextState = !h.completed;
-          if (nextState) {
-            setTimeout(() => {
-              const el = document.getElementById(`habit-${id}`);
-              if (el) el.classList.add('just-completed');
-            }, 10);
-          }
-          return { ...h, completed: nextState };
-        }
-        return h;
-      });
+      habits = habits.map(h => h.id === id ? { ...h, completed: !h.completed } : h);
       saveAndRender();
     };
 
@@ -622,11 +571,15 @@
       renderCharts();
     }
 
+    /* RENDER DE HÁBITOS CON CATEGORÍA ABAJO Y TARJETA VERDE AL COMPLETAR */
     function renderHabits() {
       const filtered = activeFilter === "Todos" ? habits : habits.filter(h => h.category === activeFilter);
       document.getElementById("habitList").innerHTML = filtered.map(h => `
         <li id="habit-${h.id}" class="habit-item ${h.completed ? 'completed' : ''}">
-          <span>[${h.category}] ${h.name}</span>
+          <div class="habit-details">
+            <span class="habit-title">${h.name}</span>
+            <span class="habit-category-subtitle">${h.category}</span>
+          </div>
           <div>
             <button class="btn-action ${h.completed ? 'check' : ''}" onclick="toggleHabit(${h.id})">${h.completed ? '✓' : '◯'}</button>
             <button class="btn-action delete" onclick="deleteHabit(${h.id})">✕</button>
@@ -636,6 +589,7 @@
     }
 
     function renderCharts() {
+      // 1. Tarta
       const total = habits.length;
       const done = habits.filter(h => h.completed).length;
       const percent = total > 0 ? Math.round((done / total) * 100) : 0;
@@ -643,6 +597,38 @@
       document.getElementById("pieSegment").setAttribute("stroke-dasharray", `${percent} 100`);
       document.getElementById("piePercent").textContent = `${percent}%`;
 
+      // 2. Gráfica de Líneas Mensual (30 Días)
+      const monthlySvg = document.getElementById("monthlyLineChart");
+      monthlySvg.innerHTML = "";
+      
+      let points = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        const val = history[dateStr] || 0;
+        
+        const x = ((29 - i) / 29) * 280 + 10;
+        const y = 90 - (val * 70);
+        points.push(`${x},${y}`);
+
+        // Puntos
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", x);
+        circle.setAttribute("cy", y);
+        circle.setAttribute("r", "3.5");
+        circle.setAttribute("fill", "var(--accent-color)");
+        monthlySvg.appendChild(circle);
+      }
+
+      const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+      polyline.setAttribute("fill", "none");
+      polyline.setAttribute("stroke", "var(--accent-color)");
+      polyline.setAttribute("stroke-width", "2.5");
+      polyline.setAttribute("points", points.join(" "));
+      monthlySvg.prepend(polyline);
+
+      // 3. Matriz Anual
       const yearGrid = document.getElementById("yearGrid");
       yearGrid.innerHTML = "";
       for (let i = 364; i >= 0; i--) {
@@ -653,16 +639,10 @@
 
         const yDot = document.createElement("div");
         let lvl = "";
-        
-        if (dayProgress >= 1) {
-          lvl = "lvl-gold";
-        } else if (dayProgress > 0.6) {
-          lvl = "lvl-3";
-        } else if (dayProgress > 0.3) {
-          lvl = "lvl-2";
-        } else if (dayProgress > 0) {
-          lvl = "lvl-1";
-        }
+        if (dayProgress >= 1) lvl = "lvl-gold";
+        else if (dayProgress > 0.6) lvl = "lvl-3";
+        else if (dayProgress > 0.3) lvl = "lvl-2";
+        else if (dayProgress > 0) lvl = "lvl-1";
 
         yDot.className = `year-dot ${lvl}`;
         yDot.title = `${dateStr}: ${Math.round(dayProgress * 100)}%`;
@@ -670,7 +650,6 @@
       }
     }
 
-    /* SISTEMA DE RACHA Y EVOLUCIÓN POR COLORES */
     function calculateStreak() {
       const today = new Date().toISOString().split('T')[0];
       const todayProgress = history[today] || 0;
@@ -679,18 +658,14 @@
       let streak = 0;
       let d = new Date();
 
-      if (!isTodayCompleted) {
-        d.setDate(d.getDate() - 1);
-      }
+      if (!isTodayCompleted) d.setDate(d.getDate() - 1);
 
       while (true) {
         const dateStr = d.toISOString().split('T')[0];
         if (history[dateStr] && history[dateStr] > 0) {
           streak++;
           d.setDate(d.getDate() - 1);
-        } else {
-          break;
-        }
+        } else break;
       }
 
       currentStreak = streak;
@@ -698,7 +673,6 @@
 
       const container = document.getElementById("streakContainer");
 
-      // Si la racha aún no se ha cumplido hoy
       if (!isTodayCompleted && currentStreak === 0) {
         container.className = "streak-tag streak-grey";
       } else if (currentStreak >= 365) {
@@ -715,7 +689,6 @@
         container.className = "streak-tag streak-orange";
       }
 
-      // Candado del tema Dorado
       const goldDot = document.getElementById("goldThemeDot");
       if (currentStreak >= 365) {
         goldDot.classList.remove("locked");
@@ -726,15 +699,9 @@
       }
     }
 
-    /* EXPORTAR E IMPORTAR DATOS JSON */
+    /* IMPORTAR Y EXPORTAR JSON */
     document.getElementById("exportJsonBtn").addEventListener("click", () => {
-      const exportData = {
-        habits: habits,
-        history: history,
-        categories: customCategories,
-        theme: localStorage.getItem("trackerTheme_v2") || "theme-naranja"
-      };
-
+      const exportData = { habits, history, categories: customCategories, theme: localStorage.getItem("trackerTheme_v2") || "theme-naranja" };
       const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -744,9 +711,7 @@
       URL.revokeObjectURL(url);
     });
 
-    document.getElementById("importJsonBtn").addEventListener("click", () => {
-      document.getElementById("importJsonInput").click();
-    });
+    document.getElementById("importJsonBtn").addEventListener("click", () => document.getElementById("importJsonInput").click());
 
     document.getElementById("importJsonInput").addEventListener("change", (e) => {
       const file = e.target.files[0];
@@ -764,13 +729,9 @@
 
             localStorage.setItem("trackerCategories_v2", JSON.stringify(customCategories));
             saveAndRender();
-            alert("¡Datos importados con éxito!");
-          } else {
-            alert("El archivo JSON no tiene el formato correcto.");
+            alert("¡Datos cargados correctamente!");
           }
-        } catch (err) {
-          alert("Error al leer el archivo JSON.");
-        }
+        } catch (err) { alert("Error al procesar el archivo JSON."); }
       };
       reader.readAsText(file);
     });
