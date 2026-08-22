@@ -564,7 +564,7 @@
         helper.textContent = "Hábito programado para: Todos los días de la semana.";
       } else if (selectedBtns.length === 0) {
         helper.textContent = "⚠️ Atención: Debes seleccionar al menos un día.";
-      } else if (selectedBtns.length === 5 && Array.from(selectedBtns).every(b => b.dataset.day >= 1 && b.dataset.day <= 5)) {
+      } else if (selectedBtns.length === 5 && Array.from(selectedBtns).every(b => parseInt(b.dataset.day) >= 1 && parseInt(b.dataset.day) <= 5)) {
         helper.textContent = "Hábito programado para: Días laborables (Lunes a Viernes).";
       } else {
         const selectedNames = Array.from(selectedBtns).map(b => dayNamesFull[b.dataset.day]);
@@ -600,7 +600,7 @@
 
     // SISTEMA XP Y LOGROS
     function addXp(amount) {
-      userXp += amount;
+      userXp = Math.max(0, userXp + amount);
       renderGamification();
     }
 
@@ -987,7 +987,7 @@
         const isDone = h.completed || (h.target && h.current >= h.target);
 
         const daysPills = dayLabelsShort.map(d => {
-          const isActive = h.days.includes(d.id);
+          const isActive = h.days && h.days.includes(d.id);
           const isToday = d.id === todayDayOfWeek;
           return `<span class="mini-day-pill ${isActive ? 'active-day' : ''} ${isToday ? 'is-today-pill' : ''}">${d.label}</span>`;
         }).join('');
@@ -1003,7 +1003,7 @@
               <div class="habit-days-pills">${daysPills}</div>
             </div>
             <div class="habit-actions">
-              <button class="btn-action pomo" onclick="openPomo(${h.id}, '${h.name}')" title="Temporizador Pomodoro">⏱️</button>
+              <button class="btn-action pomo" onclick="openPomo(${h.id}, '${h.name.replace(/'/g, "\\'")}')" title="Temporizador Pomodoro">⏱️</button>
               ${h.target ? `
                 <input type="number" class="quant-input" value="${h.current || 0}" max="${h.target}" onchange="updateQuant(${h.id}, this.value)" ${!isScheduledToday ? 'disabled' : ''}>
                 <span style="font-size: 12px; color: var(--text-muted);">/ ${h.target}</span>
@@ -1197,7 +1197,7 @@
             habits = imported.habits;
             history = imported.history;
             if (imported.dailyNotes) dailyNotes = imported.dailyNotes;
-            if (imported.userXp) userXp = imported.userXp;
+            if (imported.userXp !== undefined) userXp = imported.userXp;
             if (imported.streakFrozenDate) streakFrozenDate = imported.streakFrozenDate;
             if (imported.unlockedBadges) unlockedBadges = imported.unlockedBadges;
             if (imported.categories) customCategories = imported.categories;
