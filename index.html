@@ -20,7 +20,6 @@
       
       --gold-color: #ffd700;
       --gold-glow: rgba(255, 215, 0, 0.5);
-      --gold-gradient: linear-gradient(135deg, #ffe875 0%, #f7b731 50%, #c88d00 100%);
     }
 
     /* TEMAS DE COLOR */
@@ -35,7 +34,7 @@
     body.theme-mono { --bg-color: #0a0a0a; --card-bg: #141414; --card-bg-elevated: #242424; --text-color: #ffffff; --text-muted: #888888; --accent-color: #ffffff; --accent-glow: rgba(255, 255, 255, 0.3); --border-color: #333333; --border-bright: #666666; --dot-empty: #1c1c1c; --main-gradient: linear-gradient(135deg, #ffffff 0%, #888888 100%); }
     body.theme-atardecer { --bg-color: #12030f; --card-bg: #21081b; --card-bg-elevated: #330f2b; --text-color: #fff0f5; --text-muted: #d98cb3; --accent-color: #ff4500; --accent-glow: rgba(255, 69, 0, 0.4); --border-color: #570e3c; --border-bright: #8a1760; --dot-empty: #210619; --main-gradient: linear-gradient(135deg, #ff4500 0%, #ff007f 50%, #7f00ff 100%); }
 
-    /* KEYFRAMES Y ANIMACIONES MEJORADAS (+40%) */
+    /* ANIMACIONES */
     @keyframes fadeInApp {
       from { opacity: 0; transform: translateY(18px) scale(0.98); }
       to { opacity: 1; transform: translateY(0) scale(1); }
@@ -54,14 +53,9 @@
     }
 
     @keyframes flameFlicker {
-      0% { transform: scale(0.94) rotate(-2deg); filter: drop-shadow(0 0 4px var(--accent-color)); }
-      50% { transform: scale(1.08) rotate(2deg); filter: drop-shadow(0 0 10px var(--accent-color)); }
-      100% { transform: scale(0.96) rotate(-1deg); filter: drop-shadow(0 0 14px var(--accent-glow)); }
-    }
-
-    @keyframes godGlow {
-      from { filter: drop-shadow(0 0 8px #ffd700); }
-      to { filter: drop-shadow(0 0 20px #00e676); }
+      0% { transform: scale(0.94) rotate(-2deg); }
+      50% { transform: scale(1.08) rotate(2deg); }
+      100% { transform: scale(0.96) rotate(-1deg); }
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
@@ -165,32 +159,46 @@
       transition: border-color 0.3s ease;
     }
 
-    .quote-text { font-style: italic; color: var(--text-muted); max-width: 70%; line-height: 1.3; }
+    .quote-text { font-style: italic; color: var(--text-muted); max-width: 65%; line-height: 1.3; }
 
-    /* FUEGO ANIMADO DE RACHA */
+    /* ESTILOS Y EVOLUCIÓN DE RACHA POR NIVELES DE COLOR */
     .streak-tag {
-      background: rgba(255, 215, 0, 0.1); border: 1px solid var(--gold-color);
-      color: var(--gold-color); padding: 6px 14px; border-radius: 20px;
-      font-weight: 800; display: flex; align-items: center; gap: 8px;
-      box-shadow: 0 0 12px var(--gold-glow);
+      padding: 6px 14px; border-radius: 20px; font-weight: 800;
+      display: flex; align-items: center; gap: 8px;
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .streak-tag:hover { transform: scale(1.06); }
 
-    .flame-container {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 22px; height: 22px;
-    }
+    .flame-container { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; }
+    .flame-svg { width: 100%; height: 100%; transform-origin: bottom center; animation: flameFlicker 0.8s ease-in-out infinite alternate; }
 
-    .flame-svg {
-      width: 100%; height: 100%; transform-origin: bottom center;
-      animation: flameFlicker 0.8s ease-in-out infinite alternate;
-    }
+    /* GRIS: Racha inactiva */
+    .streak-grey { background: rgba(150, 150, 150, 0.1); border: 1px solid #777; color: #aaa; box-shadow: 0 0 8px rgba(150,150,150,0.2); }
+    .streak-grey .flame-svg path { fill: #888; }
 
-    .streak-level-1 .flame-svg path { fill: var(--accent-color); }
-    .streak-level-2 .flame-svg path { fill: url(#flameGradientMedium); }
-    .streak-level-3 .flame-svg path { fill: url(#flameGradientGod); }
-    .streak-level-3 .flame-svg { animation: flameFlicker 0.4s ease-in-out infinite alternate, godGlow 1.5s infinite alternate; }
+    /* NARANJA: 1 a 9 días */
+    .streak-orange { background: rgba(255, 119, 0, 0.15); border: 1px solid #ff7700; color: #ff7700; box-shadow: 0 0 12px rgba(255, 119, 0, 0.4); }
+    .streak-orange .flame-svg path { fill: #ff7700; }
+
+    /* ROJO: 10 a 29 días */
+    .streak-red { background: rgba(255, 42, 42, 0.15); border: 1px solid #ff2a2a; color: #ff2a2a; box-shadow: 0 0 12px rgba(255, 42, 42, 0.4); }
+    .streak-red .flame-svg path { fill: #ff2a2a; }
+
+    /* AZUL: 30 a 49 días */
+    .streak-blue { background: rgba(0, 136, 255, 0.15); border: 1px solid #0088ff; color: #0088ff; box-shadow: 0 0 12px rgba(0, 136, 255, 0.4); }
+    .streak-blue .flame-svg path { fill: #0088ff; }
+
+    /* VERDE: 50 a 99 días */
+    .streak-green { background: rgba(0, 230, 118, 0.15); border: 1px solid #00e676; color: #00e676; box-shadow: 0 0 12px rgba(0, 230, 118, 0.4); }
+    .streak-green .flame-svg path { fill: #00e676; }
+
+    /* MORADO CON TONOS DORADOS: 100 a 364 días */
+    .streak-purple-gold { background: rgba(176, 0, 255, 0.15); border: 1px solid #b000ff; color: #ffd700; box-shadow: 0 0 14px rgba(176, 0, 255, 0.5); }
+    .streak-purple-gold .flame-svg path { fill: url(#flamePurpleGold); }
+
+    /* DORADO: 365+ días */
+    .streak-gold { background: rgba(255, 215, 0, 0.2); border: 1px solid #ffd700; color: #ffd700; box-shadow: 0 0 18px rgba(255, 215, 0, 0.6); }
+    .streak-gold .flame-svg path { fill: url(#flameGold365); }
 
     /* HÁBITOS */
     .habits-section {
@@ -260,9 +268,6 @@
       font-weight: 800; font-size: 20px; color: var(--accent-color);
     }
 
-    .line-chart-container { width: 100%; height: 120px; }
-    .line-chart-svg { width: 100%; height: 100%; }
-
     .year-grid-container { width: 100%; overflow-x: auto; padding-bottom: 10px; }
     .year-grid { display: grid; grid-template-rows: repeat(7, 13px); grid-auto-flow: column; grid-auto-columns: 13px; gap: 4px; }
     .year-dot {
@@ -279,26 +284,28 @@
       box-shadow: 0 0 8px var(--gold-glow) !important;
     }
 
-    /* PANEL PERFIL & TEMAS */
+    /* PANEL PERFIL & AJUSTES */
     .profile-panel {
       position: fixed; top: 70px; right: 20px;
       background: var(--card-bg); border: 1px solid var(--border-bright);
       padding: 20px; border-radius: 12px; display: flex; flex-direction: column;
-      gap: 12px; z-index: 100; width: 290px; box-shadow: 0 8px 30px rgba(0,0,0,0.8);
+      gap: 12px; z-index: 100; width: 310px; box-shadow: 0 8px 30px rgba(0,0,0,0.8);
       animation: fadeInApp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .theme-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 8px 0; }
+    .theme-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 6px 0; }
     .theme-dot {
       width: 100%; height: 26px; border-radius: 6px; cursor: pointer; border: 2px solid transparent;
       display: flex; align-items: center; justify-content: center; font-size: 10px; transition: transform 0.2s ease;
     }
     .theme-dot:hover, .theme-dot.active { border-color: #fff; transform: scale(1.1); }
     .theme-dot.locked { cursor: not-allowed; opacity: 0.6; filter: grayscale(0.5); }
-    .theme-dot.locked:hover { transform: none; border-color: transparent; }
 
-    .theme-btn { padding: 10px; background: var(--main-gradient); border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: #000; }
+    .json-actions { display: flex; gap: 8px; margin-top: 4px; }
+    
+    .theme-btn { padding: 10px; background: var(--main-gradient); border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: #000; width: 100%; }
     .theme-btn.secondary { background: var(--border-color); color: var(--text-color); }
+    .theme-btn.accent { background: #0088ff; color: #fff; }
 
     .creators-footer {
       text-align: center; padding: 20px; font-size: 12px;
@@ -309,18 +316,18 @@
 </head>
 <body class="theme-naranja">
 
-  <!-- DEFS DE GRADIENTES SVG PARA EL FUEGO -->
+  <!-- GRADIENTES ESPECIALES SVG PARA RACHA -->
   <svg style="width:0;height:0;position:absolute;">
     <defs>
-      <linearGradient id="flameGradientMedium" x1="0%" y1="100%" x2="0%" y2="0%">
-        <stop offset="0%" stop-color="#ff3300"/>
-        <stop offset="50%" stop-color="#ff9900"/>
+      <linearGradient id="flamePurpleGold" x1="0%" y1="100%" x2="0%" y2="0%">
+        <stop offset="0%" stop-color="#b000ff"/>
+        <stop offset="50%" stop-color="#ea00d9"/>
         <stop offset="100%" stop-color="#ffd700"/>
       </linearGradient>
-      <linearGradient id="flameGradientGod" x1="0%" y1="100%" x2="0%" y2="0%">
-        <stop offset="0%" stop-color="#ff0055"/>
-        <stop offset="50%" stop-color="#ffd700"/>
-        <stop offset="100%" stop-color="#00e676"/>
+      <linearGradient id="flameGold365" x1="0%" y1="100%" x2="0%" y2="0%">
+        <stop offset="0%" stop-color="#c88d00"/>
+        <stop offset="50%" stop-color="#f7b731"/>
+        <stop offset="100%" stop-color="#ffe875"/>
       </linearGradient>
     </defs>
   </svg>
@@ -356,7 +363,7 @@
 
     <div class="motivation-bar">
       <span id="quoteText" class="quote-text">Cargando...</span>
-      <div id="streakContainer" class="streak-tag streak-level-1">
+      <div id="streakContainer" class="streak-tag streak-grey">
         <div class="flame-container">
           <svg class="flame-svg" viewBox="0 0 24 24">
             <path d="M12,2C11.5,5 9,7.5 9,10C9,12.2 10.8,14 13,14 C15.2,14 17,12.2 17,10 C17,5.5 12,2 12,2Z"/>
@@ -397,15 +404,8 @@
         </div>
       </div>
 
-      <div class="chart-card">
-        <h3>Rendimiento Mensual</h3>
-        <div class="line-chart-container">
-          <svg id="monthlyLineChart" class="line-chart-svg" viewBox="0 0 300 100" preserveAspectRatio="none"></svg>
-        </div>
-      </div>
-
       <div class="chart-card full-width">
-        <h3>Progreso Anual (365 Días)</h3>
+        <h3>Mapa de Constancia Anual (365 Días)</h3>
         <div class="year-grid-container">
           <div id="yearGrid" class="year-grid"></div>
         </div>
@@ -419,19 +419,28 @@
 
       <label style="font-size: 12px; font-weight: bold;">Seleccionar Tema:</label>
       <div class="theme-selector">
-        <div class="theme-dot" style="background: #ff7700;" onclick="setTheme('theme-naranja')" title="Naranja Neón"></div>
+        <div class="theme-dot" style="background: #ff7700;" onclick="setTheme('theme-naranja')" title="Naranja"></div>
         <div id="goldThemeDot" class="theme-dot locked" style="background: #ffd700;" onclick="setTheme('theme-dorado')" title="Dorado (Requiere 365 Días)">🔒</div>
-        <div class="theme-dot" style="background: #0088ff;" onclick="setTheme('theme-azul')" title="Azul Neón"></div>
+        <div class="theme-dot" style="background: #0088ff;" onclick="setTheme('theme-azul')" title="Azul"></div>
         <div class="theme-dot" style="background: #00e676;" onclick="setTheme('theme-esmeralda')" title="Esmeralda"></div>
         <div class="theme-dot" style="background: #b000ff;" onclick="setTheme('theme-purpura')" title="Púrpura"></div>
-        <div class="theme-dot" style="background: #ff2a2a;" onclick="setTheme('theme-rojo')" title="Rojo Carmín"></div>
-        <div class="theme-dot" style="background: #ff007f;" onclick="setTheme('theme-rosa')" title="Rosa Cyberpunk"></div>
+        <div class="theme-dot" style="background: #ff2a2a;" onclick="setTheme('theme-rojo')" title="Rojo"></div>
+        <div class="theme-dot" style="background: #ff007f;" onclick="setTheme('theme-rosa')" title="Rosa"></div>
         <div class="theme-dot" style="background: #00d2ff;" onclick="setTheme('theme-plata')" title="Plata"></div>
-        <div class="theme-dot" style="background: #ffffff;" onclick="setTheme('theme-mono')" title="Monocromático"></div>
+        <div class="theme-dot" style="background: #ffffff;" onclick="setTheme('theme-mono')" title="Mono"></div>
         <div class="theme-dot" style="background: linear-gradient(45deg, #ff4500, #ff007f);" onclick="setTheme('theme-atardecer')" title="Atardecer"></div>
       </div>
 
-      <button id="clearLocal" class="theme-btn">Cerrar Sesión</button>
+      <hr style="border-color: var(--border-color); margin: 4px 0;">
+
+      <label style="font-size: 12px; font-weight: bold;">Copia de Seguridad Data JSON:</label>
+      <div class="json-actions">
+        <button id="exportJsonBtn" class="theme-btn accent" style="font-size: 12px;">Exportar</button>
+        <button id="importJsonBtn" class="theme-btn secondary" style="font-size: 12px;">Importar</button>
+        <input type="file" id="importJsonInput" accept=".json" class="hidden">
+      </div>
+
+      <button id="clearLocal" class="theme-btn" style="margin-top: 6px;">Cerrar Sesión</button>
       <button id="closeProfile" class="theme-btn secondary">Cerrar Panel</button>
     </aside>
   </div>
@@ -466,17 +475,7 @@
       "La constancia vence al talento cuando el talento no se esfuerza.",
       "El dolor de la disciplina es temporal; el del arrepentimiento es para siempre.",
       "Construye en silencio y deja que tu éxito haga el ruido.",
-      "La motivación te pone en marcha, el hábito te mantiene creciendo.",
-      "Domina tus hábitos o tus hábitos te dominarán a ti.",
-      "Cada acción que ejecutas es un voto por la persona en la que te convertirás.",
-      "No busques perfección, busca progreso constante.",
-      "El rigor diario supera las ganas pasajeras.",
-      "Si quieres resultados extraordinarios, exige un compromiso diario.",
-      "Tu futuro está oculto en tu rutina diaria.",
-      "Crea el hábito de vencerte a ti mismo cada mañana.",
-      "El enfoque firme crea destinos increíbles.",
-      "La autodisciplina es mostrarte respeto a ti mismo.",
-      "Hoy es otra oportunidad para estar más cerca de tu meta."
+      "La motivación te pone en marcha, el hábito te mantiene creciendo."
     ];
 
     let user = null;
@@ -671,46 +670,110 @@
       }
     }
 
+    /* SISTEMA DE RACHA Y EVOLUCIÓN POR COLORES */
     function calculateStreak() {
       const today = new Date().toISOString().split('T')[0];
-      const todayDone = history[today] && history[today] > 0;
+      const todayProgress = history[today] || 0;
+      const isTodayCompleted = todayProgress > 0;
+      
       let streak = 0;
       let d = new Date();
 
-      if (!todayDone) d.setDate(d.getDate() - 1);
+      if (!isTodayCompleted) {
+        d.setDate(d.getDate() - 1);
+      }
 
       while (true) {
         const dateStr = d.toISOString().split('T')[0];
         if (history[dateStr] && history[dateStr] > 0) {
           streak++;
           d.setDate(d.getDate() - 1);
-        } else break;
+        } else {
+          break;
+        }
       }
 
       currentStreak = streak;
       document.getElementById("streakCount").textContent = currentStreak;
 
-      const streakContainer = document.getElementById("streakContainer");
-      if (currentStreak >= 10) {
-        streakContainer.className = "streak-tag streak-level-3";
-      } else if (currentStreak >= 4) {
-        streakContainer.className = "streak-tag streak-level-2";
+      const container = document.getElementById("streakContainer");
+
+      // Si la racha aún no se ha cumplido hoy
+      if (!isTodayCompleted && currentStreak === 0) {
+        container.className = "streak-tag streak-grey";
+      } else if (currentStreak >= 365) {
+        container.className = "streak-tag streak-gold";
+      } else if (currentStreak >= 100) {
+        container.className = "streak-tag streak-purple-gold";
+      } else if (currentStreak >= 50) {
+        container.className = "streak-tag streak-green";
+      } else if (currentStreak >= 30) {
+        container.className = "streak-tag streak-blue";
+      } else if (currentStreak >= 10) {
+        container.className = "streak-tag streak-red";
       } else {
-        streakContainer.className = "streak-tag streak-level-1";
+        container.className = "streak-tag streak-orange";
       }
 
-      // Desbloquear/Bloquear Tema Dorado en ajustes según la racha
+      // Candado del tema Dorado
       const goldDot = document.getElementById("goldThemeDot");
       if (currentStreak >= 365) {
         goldDot.classList.remove("locked");
         goldDot.textContent = "";
-        goldDot.title = "Dorado (Desbloqueado)";
       } else {
         goldDot.classList.add("locked");
         goldDot.textContent = "🔒";
-        goldDot.title = "Dorado (Requiere 365 Días)";
       }
     }
+
+    /* EXPORTAR E IMPORTAR DATOS JSON */
+    document.getElementById("exportJsonBtn").addEventListener("click", () => {
+      const exportData = {
+        habits: habits,
+        history: history,
+        categories: customCategories,
+        theme: localStorage.getItem("trackerTheme_v2") || "theme-naranja"
+      };
+
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `ethos_backup_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById("importJsonBtn").addEventListener("click", () => {
+      document.getElementById("importJsonInput").click();
+    });
+
+    document.getElementById("importJsonInput").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const imported = JSON.parse(event.target.result);
+          if (imported.habits && imported.history) {
+            habits = imported.habits;
+            history = imported.history;
+            if (imported.categories) customCategories = imported.categories;
+            if (imported.theme) setTheme(imported.theme);
+
+            localStorage.setItem("trackerCategories_v2", JSON.stringify(customCategories));
+            saveAndRender();
+            alert("¡Datos importados con éxito!");
+          } else {
+            alert("El archivo JSON no tiene el formato correcto.");
+          }
+        } catch (err) {
+          alert("Error al leer el archivo JSON.");
+        }
+      };
+      reader.readAsText(file);
+    });
 
     document.getElementById("openProfile").addEventListener("click", () => document.getElementById("profilePanel").classList.toggle("hidden"));
     document.getElementById("closeProfile").addEventListener("click", () => document.getElementById("profilePanel").classList.add("hidden"));
