@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ethos Discipline Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     :root {
       --bg-color: #0f0a05;
@@ -17,12 +18,9 @@
       --border-bright: #9e5300;
       --dot-empty: #261505;
       --main-gradient: linear-gradient(135deg, #ff9900 0%, #ff5500 100%);
-      
       --gold-color: #ffd700;
-      --gold-glow: rgba(255, 215, 0, 0.5);
     }
 
-    /* TEMAS DE COLOR */
     body.theme-naranja { --bg-color: #0f0a05; --card-bg: #1c130a; --card-bg-elevated: #281b0e; --text-color: #fff8f2; --text-muted: #d4a373; --accent-color: #ff7700; --accent-glow: rgba(255, 119, 0, 0.4); --border-color: #4a2800; --border-bright: #9e5300; --dot-empty: #261505; --main-gradient: linear-gradient(135deg, #ff9900 0%, #ff5500 100%); }
     body.theme-dorado { --bg-color: #0d0b03; --card-bg: #181405; --card-bg-elevated: #221c08; --text-color: #fff9e6; --text-muted: #cbb886; --accent-color: #ffd700; --accent-glow: rgba(255, 215, 0, 0.35); --border-color: #44370f; --border-bright: #8a7122; --dot-empty: #26200a; --main-gradient: linear-gradient(135deg, #ffe875 0%, #f7b731 50%, #c88d00 100%); }
     body.theme-azul { --bg-color: #030a16; --card-bg: #08142c; --card-bg-elevated: #0f1e3d; --text-color: #e6f2ff; --text-muted: #7fa2c7; --accent-color: #0088ff; --accent-glow: rgba(0, 136, 255, 0.4); --border-color: #0f3460; --border-bright: #1f5f9e; --dot-empty: #0a192f; --main-gradient: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); }
@@ -34,39 +32,20 @@
     body.theme-mono { --bg-color: #0a0a0a; --card-bg: #141414; --card-bg-elevated: #242424; --text-color: #ffffff; --text-muted: #888888; --accent-color: #ffffff; --accent-glow: rgba(255, 255, 255, 0.3); --border-color: #333333; --border-bright: #666666; --dot-empty: #1c1c1c; --main-gradient: linear-gradient(135deg, #ffffff 0%, #888888 100%); }
     body.theme-atardecer { --bg-color: #12030f; --card-bg: #21081b; --card-bg-elevated: #330f2b; --text-color: #fff0f5; --text-muted: #d98cb3; --accent-color: #ff4500; --accent-glow: rgba(255, 69, 0, 0.4); --border-color: #570e3c; --border-bright: #8a1760; --dot-empty: #210619; --main-gradient: linear-gradient(135deg, #ff4500 0%, #ff007f 50%, #7f00ff 100%); }
 
-    /* ANIMACIONES DEL FUEGO REALISTA Y FLUIDO */
-    @keyframes flameOuter {
-      0% { transform: scale(1) rotate(-1deg); }
-      50% { transform: scale(1.08, 1.12) rotate(2deg); }
-      100% { transform: scale(0.96, 0.98) rotate(-2deg); }
-    }
-    @keyframes flameMid {
-      0% { transform: scale(1) rotate(2deg); }
-      50% { transform: scale(1.1, 1.05) rotate(-1deg); }
-      100% { transform: scale(0.95, 1.02) rotate(1deg); }
-    }
-    @keyframes flameInner {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.15, 1.2); }
-      100% { transform: scale(0.9); }
-    }
+    @keyframes flameOuter { 0% { transform: scale(1) rotate(-1deg); } 50% { transform: scale(1.08, 1.12) rotate(2deg); } 100% { transform: scale(0.96, 0.98) rotate(-2deg); } }
+    @keyframes flameMid { 0% { transform: scale(1) rotate(2deg); } 50% { transform: scale(1.1, 1.05) rotate(-1deg); } 100% { transform: scale(0.95, 1.02) rotate(1deg); } }
+    @keyframes flameInner { 0% { transform: scale(1); } 50% { transform: scale(1.15, 1.2); } 100% { transform: scale(0.9); } }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
 
     body {
-      background: var(--bg-color);
-      color: var(--text-color);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding-bottom: 40px;
-      transition: background 0.4s ease, color 0.4s ease;
+      background: var(--bg-color); color: var(--text-color);
+      display: flex; flex-direction: column; align-items: center;
+      min-height: 100vh; padding-bottom: 40px; transition: background 0.4s ease, color 0.4s ease;
     }
 
     .hidden { display: none !important; }
 
-    /* AUTH MODAL */
     .auth-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(0,0,0,0.88); backdrop-filter: blur(8px);
@@ -92,43 +71,17 @@
       justify-content: center; font-size: 10px; font-weight: 900;
     }
 
-    .auth-subtitle {
-      font-size: 12px; margin-top: 10px; font-style: italic; color: var(--text-muted);
-      min-height: 40px; display: flex; align-items: center; justify-content: center;
-    }
-
+    .auth-subtitle { font-size: 12px; margin-top: 10px; font-style: italic; color: var(--text-muted); min-height: 40px; display: flex; align-items: center; justify-content: center; }
     .auth-panel { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
-    .auth-panel input {
-      padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);
-      background: var(--bg-color); color: var(--text-color); outline: none;
-    }
+    .auth-panel input { padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); outline: none; }
+    .auth-primary { padding: 12px; background: var(--main-gradient); border: none; font-weight: 800; cursor: pointer; border-radius: 8px; color: #000; }
 
-    .auth-primary {
-      padding: 12px; background: var(--main-gradient); border: none;
-      font-weight: 800; cursor: pointer; border-radius: 8px; color: #000;
-    }
-
-    /* LAYOUT PRINCIPAL */
     .main-container { width: 100%; max-width: 800px; padding: 25px 20px; flex: 1; }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
     .brand-title { display: flex; align-items: center; gap: 12px; }
-
-    .brand-icon {
-      width: 38px; height: 38px; background: var(--main-gradient);
-      border-radius: 10px; display: flex; align-items: center; justify-content: center;
-      color: #000; font-weight: 900; font-size: 20px; box-shadow: 0 0 18px var(--accent-glow);
-    }
-
-    h1 {
-      font-size: 22px; letter-spacing: 1px;
-      background: var(--main-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      font-weight: 800;
-    }
-
-    .settings-btn {
-      background: var(--main-gradient); border: none; padding: 10px 18px;
-      border-radius: 8px; cursor: pointer; font-weight: 700; color: #000;
-    }
+    .brand-icon { width: 38px; height: 38px; background: var(--main-gradient); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #000; font-weight: 900; font-size: 20px; box-shadow: 0 0 18px var(--accent-glow); }
+    h1 { font-size: 22px; letter-spacing: 1px; background: var(--main-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+    .settings-btn { background: var(--main-gradient); border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 700; color: #000; }
 
     .motivation-bar {
       background: var(--card-bg); border: 1px solid var(--border-bright);
@@ -138,87 +91,69 @@
 
     .quote-text { font-style: italic; color: var(--text-muted); max-width: 65%; line-height: 1.3; }
 
-    /* FUEGO REALISTA SVG MULTICAPA */
-    .streak-tag {
-      padding: 6px 14px; border-radius: 20px; font-weight: 800;
-      display: flex; align-items: center; gap: 8px; transition: all 0.3s;
-    }
-
+    .streak-tag { padding: 6px 14px; border-radius: 20px; font-weight: 800; display: flex; align-items: center; gap: 8px; transition: all 0.3s; }
     .flame-container { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 26px; }
     .flame-svg { width: 100%; height: 100%; overflow: visible; }
-    
     .flame-layer-outer { transform-origin: bottom center; animation: flameOuter 0.6s infinite alternate ease-in-out; }
     .flame-layer-mid { transform-origin: bottom center; animation: flameMid 0.45s infinite alternate ease-in-out; }
     .flame-layer-inner { transform-origin: bottom center; animation: flameInner 0.3s infinite alternate ease-in-out; }
 
-    /* COLORES DE RACHA */
     .streak-grey { background: rgba(150, 150, 150, 0.1); border: 1px solid #777; color: #aaa; }
-    .streak-grey .flame-layer-outer { fill: #555; }
-    .streak-grey .flame-layer-mid { fill: #777; }
-    .streak-grey .flame-layer-inner { fill: #aaa; }
-
+    .streak-grey .flame-layer-outer { fill: #555; } .streak-grey .flame-layer-mid { fill: #777; } .streak-grey .flame-layer-inner { fill: #aaa; }
     .streak-orange { background: rgba(255, 119, 0, 0.15); border: 1px solid #ff7700; color: #ff7700; }
-    .streak-orange .flame-layer-outer { fill: #ff3300; }
-    .streak-orange .flame-layer-mid { fill: #ff7700; }
-    .streak-orange .flame-layer-inner { fill: #ffcc00; }
-
+    .streak-orange .flame-layer-outer { fill: #ff3300; } .streak-orange .flame-layer-mid { fill: #ff7700; } .streak-orange .flame-layer-inner { fill: #ffcc00; }
     .streak-red { background: rgba(255, 42, 42, 0.15); border: 1px solid #ff2a2a; color: #ff2a2a; }
-    .streak-red .flame-layer-outer { fill: #990000; }
-    .streak-red .flame-layer-mid { fill: #ff2a2a; }
-    .streak-red .flame-layer-inner { fill: #ff9999; }
-
+    .streak-red .flame-layer-outer { fill: #990000; } .streak-red .flame-layer-mid { fill: #ff2a2a; } .streak-red .flame-layer-inner { fill: #ff9999; }
     .streak-blue { background: rgba(0, 136, 255, 0.15); border: 1px solid #0088ff; color: #0088ff; }
-    .streak-blue .flame-layer-outer { fill: #003399; }
-    .streak-blue .flame-layer-mid { fill: #0088ff; }
-    .streak-blue .flame-layer-inner { fill: #99ccff; }
-
+    .streak-blue .flame-layer-outer { fill: #003399; } .streak-blue .flame-layer-mid { fill: #0088ff; } .streak-blue .flame-layer-inner { fill: #99ccff; }
     .streak-green { background: rgba(0, 230, 118, 0.15); border: 1px solid #00e676; color: #00e676; }
-    .streak-green .flame-layer-outer { fill: #006633; }
-    .streak-green .flame-layer-mid { fill: #00e676; }
-    .streak-green .flame-layer-inner { fill: #b3ffcc; }
-
+    .streak-green .flame-layer-outer { fill: #006633; } .streak-green .flame-layer-mid { fill: #00e676; } .streak-green .flame-layer-inner { fill: #b3ffcc; }
     .streak-purple-gold { background: rgba(176, 0, 255, 0.15); border: 1px solid #b000ff; color: #ffd700; }
-    .streak-purple-gold .flame-layer-outer { fill: #550088; }
-    .streak-purple-gold .flame-layer-mid { fill: #b000ff; }
-    .streak-purple-gold .flame-layer-inner { fill: #ffd700; }
-
+    .streak-purple-gold .flame-layer-outer { fill: #550088; } .streak-purple-gold .flame-layer-mid { fill: #b000ff; } .streak-purple-gold .flame-layer-inner { fill: #ffd700; }
     .streak-gold { background: rgba(255, 215, 0, 0.2); border: 1px solid #ffd700; color: #ffd700; }
-    .streak-gold .flame-layer-outer { fill: #cc8800; }
-    .streak-gold .flame-layer-mid { fill: #ffd700; }
-    .streak-gold .flame-layer-inner { fill: #ffffff; }
+    .streak-gold .flame-layer-outer { fill: #cc8800; } .streak-gold .flame-layer-mid { fill: #ffd700; } .streak-gold .flame-layer-inner { fill: #ffffff; }
 
-    /* HÁBITOS REFORMATEADOS */
     .habits-section {
       background: var(--card-bg); padding: 22px; border-radius: 16px;
       border: 1px solid var(--border-color); margin-bottom: 25px;
     }
 
-    .add-habit-box { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+    .add-habit-box { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+    .add-habit-row { display: flex; gap: 10px; flex-wrap: wrap; }
     .add-habit-box input, .add-habit-box select {
       padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-color);
       background: var(--bg-color); color: var(--text-color); outline: none;
     }
-    .add-habit-box input { flex: 2; min-width: 180px; }
+    .add-habit-box input[type="text"] { flex: 2; min-width: 180px; }
+    .add-habit-box input[type="number"] { width: 100px; }
     .add-habit-box button {
       padding: 12px 20px; background: var(--main-gradient); border: none;
       border-radius: 8px; cursor: pointer; font-weight: 800; color: #000;
     }
 
-    .filters-bar { display: flex; gap: 8px; margin-bottom: 18px; overflow-x: auto; padding-bottom: 4px; }
-    .filter-btn {
-      padding: 6px 16px; background: var(--bg-color); border: 1px solid var(--border-color);
-      color: var(--text-muted); border-radius: 20px; cursor: pointer; font-size: 13px;
+    .days-picker { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+    .day-btn {
+      width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border-color);
+      background: var(--bg-color); color: var(--text-muted); cursor: pointer;
+      font-size: 11px; font-weight: bold; display: flex; align-items: center; justify-content: center;
     }
+    .day-btn.selected { background: var(--accent-color); color: #000; border-color: var(--accent-color); }
+
+    .filters-bar { display: flex; gap: 8px; margin-bottom: 18px; overflow-x: auto; padding-bottom: 4px; }
+    .filter-btn { padding: 6px 16px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 20px; cursor: pointer; font-size: 13px; }
     .filter-btn.active { background: var(--accent-color); color: #000; font-weight: 700; border-color: var(--accent-color); }
 
     .habit-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
     
-    /* TARJETA DE HÁBITO CON FONDO VERDE AL COMPLETAR Y CATEGORÍA ABAJO */
     .habit-item {
       display: flex; justify-content: space-between; align-items: center;
       padding: 14px 18px; background: var(--card-bg-elevated); border-radius: 10px;
       border: 1px solid var(--border-color); transition: all 0.3s ease;
+      cursor: grab; user-select: none;
     }
+    .habit-item:active { cursor: grabbing; }
+    .habit-item.dragging { opacity: 0.4; border: 2px dashed var(--accent-color); }
+
     .habit-item.completed {
       background: rgba(76, 209, 55, 0.15) !important;
       border-color: #4cd137 !important;
@@ -227,18 +162,27 @@
     .habit-item.completed .habit-title { text-decoration: line-through; opacity: 0.8; }
 
     .habit-details { display: flex; flex-direction: column; gap: 3px; }
+    .habit-title-row { display: flex; align-items: center; gap: 8px; }
     .habit-title { font-size: 15px; font-weight: 600; color: var(--text-color); }
+    .habit-streak-badge { font-size: 11px; font-weight: 800; color: #ff9900; background: rgba(255, 153, 0, 0.15); padding: 2px 6px; border-radius: 10px; }
     .habit-category-subtitle { font-size: 12px; font-weight: 700; color: var(--accent-color); }
+    .habit-days-subtitle { font-size: 10px; color: var(--text-muted); }
 
+    .habit-actions { display: flex; align-items: center; gap: 6px; }
     .btn-action {
       background: transparent; border: 1px solid var(--border-color);
       color: var(--text-color); padding: 6px 12px; border-radius: 6px;
-      cursor: pointer; font-size: 14px; margin-left: 6px;
+      cursor: pointer; font-size: 14px;
     }
     .btn-action.check { color: #4cd137; border-color: #4cd137; }
     .btn-action.delete { color: #e74c3c; border-color: #e74c3c; }
 
-    /* GRÁFICAS */
+    .quant-input {
+      width: 55px; padding: 4px 6px; border-radius: 4px;
+      border: 1px solid var(--border-color); background: var(--bg-color);
+      color: var(--text-color); text-align: center; font-size: 13px;
+    }
+
     .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
     @media (max-width: 650px) { .charts-grid { grid-template-columns: 1fr; } }
 
@@ -257,7 +201,6 @@
       font-weight: 800; font-size: 20px; color: var(--accent-color);
     }
 
-    /* GRÁFICA DE PUNTOS MENSUAL SVG */
     .line-chart-container { width: 100%; height: 130px; display: flex; align-items: center; justify-content: center; }
     .line-chart-svg { width: 100%; height: 100%; overflow: visible; }
 
@@ -269,7 +212,6 @@
     .year-dot.lvl-3 { background: var(--accent-color); }
     .year-dot.lvl-gold { background: var(--gold-color) !important; }
 
-    /* PANEL AJUSTES */
     .profile-panel {
       position: fixed; top: 70px; right: 20px; background: var(--card-bg);
       border: 1px solid var(--border-bright); padding: 20px; border-radius: 12px;
@@ -290,7 +232,6 @@
 </head>
 <body class="theme-naranja">
 
-  <!-- AUTH MODAL -->
   <div id="authOverlay" class="auth-overlay">
     <div class="auth-modal">
       <div class="ethos-badge">
@@ -321,11 +262,8 @@
       <div id="streakContainer" class="streak-tag streak-grey">
         <div class="flame-container">
           <svg class="flame-svg" viewBox="0 0 50 65">
-            <!-- Capa Exterior del Fuego -->
             <path class="flame-layer-outer" d="M25,5 C32,18 45,28 45,43 C45,55 36,63 25,63 C14,63 5,55 5,43 C5,28 18,18 25,5 Z"/>
-            <!-- Capa Intermedia -->
             <path class="flame-layer-mid" d="M25,18 C30,27 38,34 38,45 C38,53 32,58 25,58 C18,58 12,53 12,45 C12,34 20,27 25,18 Z"/>
-            <!-- Núcleo Brillante -->
             <path class="flame-layer-inner" d="M25,32 C28,37 31,41 31,48 C31,52 28,55 25,55 C22,55 19,52 19,48 C19,41 22,37 25,32 Z"/>
           </svg>
         </div>
@@ -333,24 +271,35 @@
       </div>
     </div>
 
-    <!-- HÁBITOS -->
     <section class="habits-section">
       <div class="add-habit-box">
-        <input type="text" id="habitInput" placeholder="Añadir nuevo hábito...">
-        <select id="categorySelect">
-          <option value="Salud">🏥 Salud</option>
-          <option value="Estudio">📚 Estudio</option>
-          <option value="Personal">👤 Personal</option>
-          <option value="__NEW__">+ Nueva categoría...</option>
-        </select>
-        <button id="addHabitBtn">Añadir</button>
+        <div class="add-habit-row">
+          <input type="text" id="habitInput" placeholder="Añadir nuevo hábito...">
+          <select id="categorySelect">
+            <option value="Salud">🏥 Salud</option>
+            <option value="Estudio">📚 Estudio</option>
+            <option value="Personal">👤 Personal</option>
+            <option value="__NEW__">+ Nueva categoría...</option>
+          </select>
+          <input type="number" id="habitTarget" placeholder="Meta (ej: 2000)" min="1">
+          <button id="addHabitBtn">Añadir</button>
+        </div>
+        <div class="days-picker">
+          <span style="font-size:12px; color:var(--text-muted); margin-right:4px;">Días:</span>
+          <button class="day-btn selected" data-day="1">L</button>
+          <button class="day-btn selected" data-day="2">M</button>
+          <button class="day-btn selected" data-day="3">X</button>
+          <button class="day-btn selected" data-day="4">J</button>
+          <button class="day-btn selected" data-day="5">V</button>
+          <button class="day-btn selected" data-day="6">S</button>
+          <button class="day-btn selected" data-day="0">D</button>
+        </div>
       </div>
 
       <div id="filtersBar" class="filters-bar"></div>
       <ul id="habitList" class="habit-list"></ul>
     </section>
 
-    <!-- GRÁFICAS -->
     <section class="charts-grid">
       <div class="chart-card">
         <h3>Progreso Hoy</h3>
@@ -378,7 +327,6 @@
       </div>
     </section>
 
-    <!-- PANEL AJUSTES PERFIL -->
     <aside id="profilePanel" class="profile-panel hidden">
       <h3>Ajustes</h3>
       <p style="font-size: 13px;"><strong>Usuario:</strong> <span id="profileName">-</span></p>
@@ -440,11 +388,50 @@
     ];
 
     let user = null;
-    let habits = JSON.parse(localStorage.getItem("trackerHabits_v2")) || [];
-    let history = JSON.parse(localStorage.getItem("trackerHistory_v2")) || {};
-    let customCategories = JSON.parse(localStorage.getItem("trackerCategories_v2")) || ["Salud", "Estudio", "Personal"];
+    let habits = [];
+    let history = {};
+    let customCategories = ["Salud", "Estudio", "Personal"];
     let activeFilter = "Todos";
     let currentStreak = 0;
+    let wasAllCompletedToday = false;
+
+    // MOTOR AUDIO WEB SINTÉTICO (SIN ARCHIVOS EXTERNOS)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'check') {
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1); // A5
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+      } else if (type === 'uncheck') {
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(220, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1);
+      } else if (type === 'fanfare') {
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.connect(g); g.connect(audioCtx.destination);
+          o.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.08);
+          g.gain.setValueAtTime(0.12, audioCtx.currentTime + idx * 0.08);
+          g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + idx * 0.08 + 0.25);
+          o.start(audioCtx.currentTime + idx * 0.08);
+          o.stop(audioCtx.currentTime + idx * 0.08 + 0.25);
+        });
+      }
+    }
 
     function getRandomQuote() { return MOTIVATIONAL_QUOTES[Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)]; }
 
@@ -461,16 +448,63 @@
       }
       document.body.className = themeClass;
       localStorage.setItem("trackerTheme_v2", themeClass);
+      saveToCloud();
     };
+
+    // BOTONES SELECCIÓN DÍAS
+    document.querySelectorAll(".day-btn").forEach(btn => {
+      btn.addEventListener("click", () => btn.classList.toggle("selected"));
+    });
+
+    async function syncFromCloud() {
+      if (!user) return;
+      const docId = user.email.replace(/[^a-zA-Z0-9]/g, "_");
+      const ref = doc(db, "userData", docId);
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        const data = snap.data();
+        habits = data.habits || [];
+        history = data.history || {};
+        customCategories = data.categories || ["Salud", "Estudio", "Personal"];
+        if (data.theme) setTheme(data.theme);
+      } else {
+        habits = JSON.parse(localStorage.getItem("trackerHabits_v2")) || [];
+        history = JSON.parse(localStorage.getItem("trackerHistory_v2")) || {};
+        customCategories = JSON.parse(localStorage.getItem("trackerCategories_v2")) || ["Salud", "Estudio", "Personal"];
+      }
+      checkDailyReset();
+      renderCategoryOptions();
+      saveAndRender(false);
+    }
+
+    async function saveToCloud() {
+      localStorage.setItem("trackerHabits_v2", JSON.stringify(habits));
+      localStorage.setItem("trackerHistory_v2", JSON.stringify(history));
+      localStorage.setItem("trackerCategories_v2", JSON.stringify(customCategories));
+
+      if (user) {
+        const docId = user.email.replace(/[^a-zA-Z0-9]/g, "_");
+        await setDoc(doc(db, "userData", docId), {
+          habits, history, categories: customCategories,
+          theme: localStorage.getItem("trackerTheme_v2") || "theme-naranja"
+        }, { merge: true });
+      }
+    }
 
     function checkDailyReset() {
       const today = new Date().toISOString().split('T')[0];
       const lastOpened = localStorage.getItem("trackerLastDate_v2");
 
       if (lastOpened !== today) {
-        habits = habits.map(h => ({ ...h, completed: false }));
+        habits = habits.map(h => {
+          const wasDone = h.completed || (h.target && h.current >= h.target);
+          let newStreak = h.streak || 0;
+          if (!wasDone) newStreak = 0; // Se interrumpe la racha individual si no se completó
+          return { ...h, completed: false, current: 0, streak: newStreak };
+        });
         localStorage.setItem("trackerLastDate_v2", today);
-        localStorage.setItem("trackerHabits_v2", JSON.stringify(habits));
+        saveToCloud();
       }
     }
 
@@ -480,9 +514,7 @@
       } else {
         document.getElementById("authOverlay").classList.add("hidden");
         document.getElementById("profileName").textContent = user.email;
-        checkDailyReset();
-        renderCategoryOptions();
-        saveAndRender();
+        syncFromCloud();
       }
     }
 
@@ -513,7 +545,6 @@
           const formatted = newCat.trim();
           if (!customCategories.includes(formatted)) {
             customCategories.push(formatted);
-            localStorage.setItem("trackerCategories_v2", JSON.stringify(customCategories));
           }
           renderCategoryOptions();
           categorySelect.value = formatted;
@@ -535,15 +566,58 @@
     document.getElementById("addHabitBtn").addEventListener("click", () => {
       const text = document.getElementById("habitInput").value.trim();
       const cat = categorySelect.value;
-      if (!text || cat === "__NEW__") return;
+      const targetVal = parseInt(document.getElementById("habitTarget").value) || null;
+      
+      const selectedDays = [];
+      document.querySelectorAll(".day-btn.selected").forEach(b => selectedDays.push(parseInt(b.dataset.day)));
 
-      habits.push({ id: Date.now(), name: text, category: cat, completed: false });
+      if (!text || cat === "__NEW__" || selectedDays.length === 0) return alert("Rellena el nombre del hábito y selecciona al menos 1 día.");
+
+      habits.push({
+        id: Date.now(),
+        name: text,
+        category: cat,
+        completed: false,
+        days: selectedDays,
+        target: targetVal,
+        current: 0,
+        streak: 0
+      });
+
       document.getElementById("habitInput").value = "";
+      document.getElementById("habitTarget").value = "";
       saveAndRender();
     });
 
     window.toggleHabit = (id) => {
-      habits = habits.map(h => h.id === id ? { ...h, completed: !h.completed } : h);
+      habits = habits.map(h => {
+        if (h.id === id) {
+          const isDone = !h.completed;
+          let newStreak = h.streak || 0;
+          if (isDone) { newStreak++; playSound('check'); }
+          else { newStreak = Math.max(0, newStreak - 1); playSound('uncheck'); }
+          return { ...h, completed: isDone, current: isDone && h.target ? h.target : 0, streak: newStreak };
+        }
+        return h;
+      });
+      saveAndRender();
+    };
+
+    window.updateQuant = (id, val) => {
+      habits = habits.map(h => {
+        if (h.id === id) {
+          const cur = Math.max(0, parseInt(val) || 0);
+          const wasDone = h.completed;
+          const isDone = h.target ? cur >= h.target : false;
+          let newStreak = h.streak || 0;
+
+          if (isDone && !wasDone) { newStreak++; playSound('check'); }
+          else if (!isDone && wasDone) { newStreak = Math.max(0, newStreak - 1); playSound('uncheck'); }
+
+          return { ...h, current: cur, completed: isDone, streak: newStreak };
+        }
+        return h;
+      });
       saveAndRender();
     };
 
@@ -558,46 +632,132 @@
       renderHabits();
     };
 
-    function saveAndRender() {
-      localStorage.setItem("trackerHabits_v2", JSON.stringify(habits));
+    function saveAndRender(triggerCloud = true) {
       const today = new Date().toISOString().split('T')[0];
-      const total = habits.length;
-      const done = habits.filter(h => h.completed).length;
+      const todayDayOfWeek = new Date().getDay();
+
+      const activeTodayHabits = habits.filter(h => !h.days || h.days.includes(todayDayOfWeek));
+      const total = activeTodayHabits.length;
+      const done = activeTodayHabits.filter(h => h.completed || (h.target && h.current >= h.target)).length;
+
       history[today] = total > 0 ? (done / total) : 0;
-      localStorage.setItem("trackerHistory_v2", JSON.stringify(history));
+
+      // CONFETI Y FANFARRIA AL COMPLETAR TODO HOY
+      if (total > 0 && done === total) {
+        if (!wasAllCompletedToday) {
+          confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+          playSound('fanfare');
+          wasAllCompletedToday = true;
+        }
+      } else {
+        wasAllCompletedToday = false;
+      }
+
+      if (triggerCloud) saveToCloud();
 
       calculateStreak();
       renderHabits();
       renderCharts();
     }
 
-    /* RENDER DE HÁBITOS CON CATEGORÍA ABAJO Y TARJETA VERDE AL COMPLETAR */
+    const dayLabels = { 1: "L", 2: "M", 3: "X", 4: "J", 5: "V", 6: "S", 0: "D" };
+
     function renderHabits() {
-      const filtered = activeFilter === "Todos" ? habits : habits.filter(h => h.category === activeFilter);
-      document.getElementById("habitList").innerHTML = filtered.map(h => `
-        <li id="habit-${h.id}" class="habit-item ${h.completed ? 'completed' : ''}">
-          <div class="habit-details">
-            <span class="habit-title">${h.name}</span>
-            <span class="habit-category-subtitle">${h.category}</span>
-          </div>
-          <div>
-            <button class="btn-action ${h.completed ? 'check' : ''}" onclick="toggleHabit(${h.id})">${h.completed ? '✓' : '◯'}</button>
-            <button class="btn-action delete" onclick="deleteHabit(${h.id})">✕</button>
-          </div>
-        </li>
-      `).join('');
+      const todayDayOfWeek = new Date().getDay();
+      const habitList = document.getElementById("habitList");
+      
+      const filtered = habits.filter(h => {
+        if (activeFilter !== "Todos" && h.category !== activeFilter) return false;
+        return true;
+      });
+
+      habitList.innerHTML = filtered.map(h => {
+        const isScheduledToday = !h.days || h.days.includes(todayDayOfWeek);
+        const isDone = h.completed || (h.target && h.current >= h.target);
+        const daysFormatted = h.days ? h.days.map(d => dayLabels[d]).join(' ') : 'Todos';
+
+        return `
+          <li id="habit-${h.id}" class="habit-item ${isDone ? 'completed' : ''}" draggable="true">
+            <div class="habit-details">
+              <div class="habit-title-row">
+                <span class="habit-title" style="${!isScheduledToday ? 'opacity: 0.6;' : ''}">${h.name}</span>
+                ${h.streak ? `<span class="habit-streak-badge">🔥 ${h.streak}d</span>` : ''}
+              </div>
+              <span class="habit-category-subtitle">${h.category}</span>
+              <span class="habit-days-subtitle">📅 ${daysFormatted} ${!isScheduledToday ? '(No hoy)' : ''}</span>
+            </div>
+            <div class="habit-actions">
+              ${h.target ? `
+                <input type="number" class="quant-input" value="${h.current || 0}" max="${h.target}" onchange="updateQuant(${h.id}, this.value)">
+                <span style="font-size: 12px; color: var(--text-muted);">/ ${h.target}</span>
+              ` : `
+                <button class="btn-action ${isDone ? 'check' : ''}" onclick="toggleHabit(${h.id})">${isDone ? '✓' : '◯'}</button>
+              `}
+              <button class="btn-action delete" onclick="deleteHabit(${h.id})">✕</button>
+            </div>
+          </li>
+        `;
+      }).join('');
+
+      setupDragAndDrop();
+    }
+
+    // ARRASTRAR Y REORDENAR (DRAG & DROP)
+    function setupDragAndDrop() {
+      const list = document.getElementById("habitList");
+      let draggedItem = null;
+
+      list.querySelectorAll(".habit-item").forEach(item => {
+        item.addEventListener("dragstart", () => {
+          draggedItem = item;
+          setTimeout(() => item.classList.add("dragging"), 0);
+        });
+
+        item.addEventListener("dragend", () => {
+          item.classList.remove("dragging");
+          draggedItem = null;
+
+          // Guardar el nuevo orden de los IDs
+          const newOrderIds = Array.from(list.querySelectorAll(".habit-item")).map(el => parseInt(el.id.replace("habit-", "")));
+          habits.sort((a, b) => newOrderIds.indexOf(a.id) - newOrderIds.indexOf(b.id));
+          saveToCloud();
+        });
+      });
+
+      list.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(list, e.clientY);
+        if (afterElement == null) {
+          list.appendChild(draggedItem);
+        } else {
+          list.insertBefore(draggedItem, afterElement);
+        }
+      });
+    }
+
+    function getDragAfterElement(container, y) {
+      const draggableElements = [...container.querySelectorAll(".habit-item:not(.dragging)")];
+      return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
 
     function renderCharts() {
-      // 1. Tarta
-      const total = habits.length;
-      const done = habits.filter(h => h.completed).length;
+      const todayDayOfWeek = new Date().getDay();
+      const activeToday = habits.filter(h => !h.days || h.days.includes(todayDayOfWeek));
+      const total = activeToday.length;
+      const done = activeToday.filter(h => h.completed || (h.target && h.current >= h.target)).length;
       const percent = total > 0 ? Math.round((done / total) * 100) : 0;
 
       document.getElementById("pieSegment").setAttribute("stroke-dasharray", `${percent} 100`);
       document.getElementById("piePercent").textContent = `${percent}%`;
 
-      // 2. Gráfica de Líneas Mensual (30 Días)
       const monthlySvg = document.getElementById("monthlyLineChart");
       monthlySvg.innerHTML = "";
       
@@ -612,7 +772,6 @@
         const y = 90 - (val * 70);
         points.push(`${x},${y}`);
 
-        // Puntos
         const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         circle.setAttribute("cx", x);
         circle.setAttribute("cy", y);
@@ -628,7 +787,6 @@
       polyline.setAttribute("points", points.join(" "));
       monthlySvg.prepend(polyline);
 
-      // 3. Matriz Anual
       const yearGrid = document.getElementById("yearGrid");
       yearGrid.innerHTML = "";
       for (let i = 364; i >= 0; i--) {
@@ -699,7 +857,6 @@
       }
     }
 
-    /* IMPORTAR Y EXPORTAR JSON */
     document.getElementById("exportJsonBtn").addEventListener("click", () => {
       const exportData = { habits, history, categories: customCategories, theme: localStorage.getItem("trackerTheme_v2") || "theme-naranja" };
       const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
@@ -727,9 +884,8 @@
             if (imported.categories) customCategories = imported.categories;
             if (imported.theme) setTheme(imported.theme);
 
-            localStorage.setItem("trackerCategories_v2", JSON.stringify(customCategories));
             saveAndRender();
-            alert("¡Datos cargados correctamente!");
+            alert("¡Datos importados y sincronizados correctamente!");
           }
         } catch (err) { alert("Error al procesar el archivo JSON."); }
       };
