@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ethos Discipline Tracker</title>
   <style>
-    /* VARIABLES Y 10 TEMAS DE COLOR */
     :root {
       --bg-color: #0f0a05;
       --card-bg: #1c130a;
@@ -24,6 +23,7 @@
       --gold-gradient: linear-gradient(135deg, #ffe875 0%, #f7b731 50%, #c88d00 100%);
     }
 
+    /* TEMAS DE COLOR */
     body.theme-naranja { --bg-color: #0f0a05; --card-bg: #1c130a; --card-bg-elevated: #281b0e; --text-color: #fff8f2; --text-muted: #d4a373; --accent-color: #ff7700; --accent-glow: rgba(255, 119, 0, 0.4); --border-color: #4a2800; --border-bright: #9e5300; --dot-empty: #261505; --main-gradient: linear-gradient(135deg, #ff9900 0%, #ff5500 100%); }
     body.theme-dorado { --bg-color: #0d0b03; --card-bg: #181405; --card-bg-elevated: #221c08; --text-color: #fff9e6; --text-muted: #cbb886; --accent-color: #ffd700; --accent-glow: rgba(255, 215, 0, 0.35); --border-color: #44370f; --border-bright: #8a7122; --dot-empty: #26200a; --main-gradient: linear-gradient(135deg, #ffe875 0%, #f7b731 50%, #c88d00 100%); }
     body.theme-azul { --bg-color: #030a16; --card-bg: #08142c; --card-bg-elevated: #0f1e3d; --text-color: #e6f2ff; --text-muted: #7fa2c7; --accent-color: #0088ff; --accent-glow: rgba(0, 136, 255, 0.4); --border-color: #0f3460; --border-bright: #1f5f9e; --dot-empty: #0a192f; --main-gradient: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); }
@@ -35,22 +35,33 @@
     body.theme-mono { --bg-color: #0a0a0a; --card-bg: #141414; --card-bg-elevated: #242424; --text-color: #ffffff; --text-muted: #888888; --accent-color: #ffffff; --accent-glow: rgba(255, 255, 255, 0.3); --border-color: #333333; --border-bright: #666666; --dot-empty: #1c1c1c; --main-gradient: linear-gradient(135deg, #ffffff 0%, #888888 100%); }
     body.theme-atardecer { --bg-color: #12030f; --card-bg: #21081b; --card-bg-elevated: #330f2b; --text-color: #fff0f5; --text-muted: #d98cb3; --accent-color: #ff4500; --accent-glow: rgba(255, 69, 0, 0.4); --border-color: #570e3c; --border-bright: #8a1760; --dot-empty: #210619; --main-gradient: linear-gradient(135deg, #ff4500 0%, #ff007f 50%, #7f00ff 100%); }
 
-    /* KEYFRAMES ANIMACIONES */
+    /* KEYFRAMES Y ANIMACIONES MEJORADAS (+40%) */
     @keyframes fadeInApp {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(18px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     @keyframes popClick {
       0% { transform: scale(1); }
-      50% { transform: scale(0.93); }
+      50% { transform: scale(0.92); }
       100% { transform: scale(1); }
     }
 
     @keyframes successCheck {
-      0% { transform: scale(0.8); opacity: 0.5; }
-      50% { transform: scale(1.15); }
+      0% { transform: scale(0.85); opacity: 0.5; }
+      50% { transform: scale(1.18); }
       100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes flameFlicker {
+      0% { transform: scale(0.94) rotate(-2deg); filter: drop-shadow(0 0 4px var(--accent-color)); }
+      50% { transform: scale(1.08) rotate(2deg); filter: drop-shadow(0 0 10px var(--accent-color)); }
+      100% { transform: scale(0.96) rotate(-1deg); filter: drop-shadow(0 0 14px var(--accent-glow)); }
+    }
+
+    @keyframes godGlow {
+      from { filter: drop-shadow(0 0 8px #ffd700); }
+      to { filter: drop-shadow(0 0 20px #00e676); }
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
@@ -64,12 +75,12 @@
       min-height: 100vh;
       padding-bottom: 40px;
       animation: fadeInApp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-      transition: background 0.3s, color 0.3s;
+      transition: background 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease;
     }
 
     .hidden { display: none !important; }
 
-    button, input, select { transition: all 0.2s ease; }
+    button, input, select { transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
     button:active { animation: popClick 0.2s ease; }
 
     /* AUTH MODAL */
@@ -87,8 +98,8 @@
       border: 2px solid var(--border-bright);
       text-align: center;
       width: 350px;
-      box-shadow: 0 0 30px var(--accent-glow);
-      animation: fadeInApp 0.4s ease-out;
+      box-shadow: 0 0 35px var(--accent-glow);
+      animation: fadeInApp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .ethos-badge {
@@ -114,13 +125,13 @@
       padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);
       background: var(--bg-color); color: var(--text-color); outline: none;
     }
-    .auth-panel input:focus { border-color: var(--accent-color); box-shadow: 0 0 8px var(--accent-glow); }
+    .auth-panel input:focus { border-color: var(--accent-color); box-shadow: 0 0 10px var(--accent-glow); }
 
     .auth-primary {
       padding: 12px; background: var(--main-gradient); border: none;
       font-weight: 800; cursor: pointer; border-radius: 8px; color: #000;
     }
-    .auth-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px var(--accent-glow); }
+    .auth-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--accent-glow); }
 
     /* LAYOUT PRINCIPAL */
     .main-container { width: 100%; max-width: 800px; padding: 25px 20px; flex: 1; }
@@ -130,7 +141,7 @@
     .brand-icon {
       width: 38px; height: 38px; background: var(--main-gradient);
       border-radius: 10px; display: flex; align-items: center; justify-content: center;
-      color: #000; font-weight: 900; font-size: 20px; box-shadow: 0 0 15px var(--accent-glow);
+      color: #000; font-weight: 900; font-size: 20px; box-shadow: 0 0 18px var(--accent-glow);
     }
 
     h1 {
@@ -144,28 +155,48 @@
       border-radius: 8px; cursor: pointer; font-weight: 700; color: #000;
       box-shadow: 0 4px 15px var(--accent-glow);
     }
-    .settings-btn:hover { transform: translateY(-2px); }
+    .settings-btn:hover { transform: translateY(-2px) scale(1.03); }
 
     .motivation-bar {
       background: var(--card-bg); border: 1px solid var(--border-bright);
       padding: 16px 20px; border-radius: 14px; margin-bottom: 25px;
       display: flex; justify-content: space-between; align-items: center; font-size: 14px;
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      transition: border-color 0.3s ease;
     }
 
     .quote-text { font-style: italic; color: var(--text-muted); max-width: 70%; line-height: 1.3; }
 
+    /* FUEGO ANIMADO DE RACHA */
     .streak-tag {
       background: rgba(255, 215, 0, 0.1); border: 1px solid var(--gold-color);
       color: var(--gold-color); padding: 6px 14px; border-radius: 20px;
       font-weight: 800; display: flex; align-items: center; gap: 8px;
       box-shadow: 0 0 12px var(--gold-glow);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+    .streak-tag:hover { transform: scale(1.06); }
+
+    .flame-container {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px;
+    }
+
+    .flame-svg {
+      width: 100%; height: 100%; transform-origin: bottom center;
+      animation: flameFlicker 0.8s ease-in-out infinite alternate;
+    }
+
+    .streak-level-1 .flame-svg path { fill: var(--accent-color); }
+    .streak-level-2 .flame-svg path { fill: url(#flameGradientMedium); }
+    .streak-level-3 .flame-svg path { fill: url(#flameGradientGod); }
+    .streak-level-3 .flame-svg { animation: flameFlicker 0.4s ease-in-out infinite alternate, godGlow 1.5s infinite alternate; }
 
     /* HÁBITOS */
     .habits-section {
       background: var(--card-bg); padding: 22px; border-radius: 16px;
       border: 1px solid var(--border-color); margin-bottom: 25px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
     }
 
     .add-habit-box { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
@@ -174,11 +205,12 @@
       background: var(--bg-color); color: var(--text-color); outline: none;
     }
     .add-habit-box input { flex: 2; min-width: 180px; }
-    .add-habit-box input:focus, .add-habit-box select:focus { border-color: var(--accent-color); }
+    .add-habit-box input:focus, .add-habit-box select:focus { border-color: var(--accent-color); box-shadow: 0 0 8px var(--accent-glow); }
     .add-habit-box button {
       padding: 12px 20px; background: var(--main-gradient); border: none;
       border-radius: 8px; cursor: pointer; font-weight: 800; color: #000;
     }
+    .add-habit-box button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px var(--accent-glow); }
 
     .filters-bar { display: flex; gap: 8px; margin-bottom: 18px; overflow-x: auto; padding-bottom: 4px; }
     .filter-btn {
@@ -191,19 +223,19 @@
     .habit-item {
       display: flex; justify-content: space-between; align-items: center;
       padding: 14px 18px; background: var(--card-bg-elevated); border-radius: 10px;
-      border: 1px solid var(--border-color); transition: all 0.2s ease;
+      border: 1px solid var(--border-color); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .habit-item:hover { border-color: var(--border-bright); transform: translateX(3px); }
-    .habit-item.completed { opacity: 0.6; }
+    .habit-item:hover { border-color: var(--border-bright); transform: translateX(4px); }
+    .habit-item.completed { opacity: 0.55; }
     .habit-item.completed span { text-decoration: line-through; }
-    .habit-item.just-completed { animation: successCheck 0.4s ease-out; }
+    .habit-item.just-completed { animation: successCheck 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
 
     .btn-action {
       background: transparent; border: 1px solid var(--border-color);
       color: var(--text-color); padding: 6px 12px; border-radius: 6px;
       cursor: pointer; font-size: 14px; margin-left: 6px;
     }
-    .btn-action:hover { background: var(--border-color); }
+    .btn-action:hover { background: var(--border-color); transform: scale(1.05); }
     .btn-action.check { color: #4cd137; border-color: #4cd137; }
     .btn-action.delete { color: #e74c3c; border-color: #e74c3c; }
 
@@ -214,7 +246,9 @@
     .chart-card {
       background: var(--card-bg); padding: 22px; border-radius: 16px;
       border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center;
+      transition: all 0.3s ease;
     }
+    .chart-card:hover { border-color: var(--border-bright); transform: translateY(-2px); }
     .chart-card.full-width { grid-column: 1 / -1; width: 100%; }
     .chart-card h3 { margin-bottom: 18px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-color); }
 
@@ -231,30 +265,37 @@
 
     .year-grid-container { width: 100%; overflow-x: auto; padding-bottom: 10px; }
     .year-grid { display: grid; grid-template-rows: repeat(7, 13px); grid-auto-flow: column; grid-auto-columns: 13px; gap: 4px; }
-    .year-dot { width: 13px; height: 13px; border-radius: 3px; background: var(--dot-empty); transition: all 0.2s; }
+    .year-dot {
+      width: 13px; height: 13px; border-radius: 3px; background: var(--dot-empty);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s;
+    }
+    .year-dot:hover { transform: scale(1.6); z-index: 5; cursor: pointer; }
 
     .year-dot.lvl-1 { background: rgba(255, 255, 255, 0.2); }
     .year-dot.lvl-2 { background: var(--border-bright); }
-    .year-dot.lvl-3 { background: var(--accent-color); box-shadow: 0 0 5px var(--accent-glow); }
+    .year-dot.lvl-3 { background: var(--accent-color); box-shadow: 0 0 6px var(--accent-glow); }
     .year-dot.lvl-gold {
       background: var(--gold-color) !important;
       box-shadow: 0 0 8px var(--gold-glow) !important;
     }
 
-    /* PANEL PERFIL */
+    /* PANEL PERFIL & TEMAS */
     .profile-panel {
       position: fixed; top: 70px; right: 20px;
       background: var(--card-bg); border: 1px solid var(--border-bright);
       padding: 20px; border-radius: 12px; display: flex; flex-direction: column;
       gap: 12px; z-index: 100; width: 290px; box-shadow: 0 8px 30px rgba(0,0,0,0.8);
-      animation: fadeInApp 0.3s ease;
+      animation: fadeInApp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .theme-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 8px 0; }
     .theme-dot {
       width: 100%; height: 26px; border-radius: 6px; cursor: pointer; border: 2px solid transparent;
+      display: flex; align-items: center; justify-content: center; font-size: 10px; transition: transform 0.2s ease;
     }
-    .theme-dot:hover, .theme-dot.active { border-color: #fff; transform: scale(1.08); }
+    .theme-dot:hover, .theme-dot.active { border-color: #fff; transform: scale(1.1); }
+    .theme-dot.locked { cursor: not-allowed; opacity: 0.6; filter: grayscale(0.5); }
+    .theme-dot.locked:hover { transform: none; border-color: transparent; }
 
     .theme-btn { padding: 10px; background: var(--main-gradient); border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: #000; }
     .theme-btn.secondary { background: var(--border-color); color: var(--text-color); }
@@ -267,6 +308,22 @@
   </style>
 </head>
 <body class="theme-naranja">
+
+  <!-- DEFS DE GRADIENTES SVG PARA EL FUEGO -->
+  <svg style="width:0;height:0;position:absolute;">
+    <defs>
+      <linearGradient id="flameGradientMedium" x1="0%" y1="100%" x2="0%" y2="0%">
+        <stop offset="0%" stop-color="#ff3300"/>
+        <stop offset="50%" stop-color="#ff9900"/>
+        <stop offset="100%" stop-color="#ffd700"/>
+      </linearGradient>
+      <linearGradient id="flameGradientGod" x1="0%" y1="100%" x2="0%" y2="0%">
+        <stop offset="0%" stop-color="#ff0055"/>
+        <stop offset="50%" stop-color="#ffd700"/>
+        <stop offset="100%" stop-color="#00e676"/>
+      </linearGradient>
+    </defs>
+  </svg>
 
   <!-- AUTH MODAL -->
   <div id="authOverlay" class="auth-overlay">
@@ -299,13 +356,18 @@
 
     <div class="motivation-bar">
       <span id="quoteText" class="quote-text">Cargando...</span>
-      <span class="streak-tag">
-        <span>👑</span>
+      <div id="streakContainer" class="streak-tag streak-level-1">
+        <div class="flame-container">
+          <svg class="flame-svg" viewBox="0 0 24 24">
+            <path d="M12,2C11.5,5 9,7.5 9,10C9,12.2 10.8,14 13,14 C15.2,14 17,12.2 17,10 C17,5.5 12,2 12,2Z"/>
+            <path d="M12,22C16.4,22 20,18.4 20,14C20,10.2 17.3,7 13.8,6.2C14.5,8 14,9.8 12.8,11C11.3,12.5 10,12 9,14C8,15.5 8.5,18 10,20C8.5,19.5 7.5,18 7.5,16.5C5.4,18.3 5,21.3 8,22H12Z"/>
+          </svg>
+        </div>
         <span>Racha:</span> <span id="streakCount">0</span>
-      </span>
+      </div>
     </div>
 
-    <!-- HABITS -->
+    <!-- HÁBITOS -->
     <section class="habits-section">
       <div class="add-habit-box">
         <input type="text" id="habitInput" placeholder="Añadir nuevo hábito...">
@@ -322,14 +384,14 @@
       <ul id="habitList" class="habit-list"></ul>
     </section>
 
-    <!-- CHARTS -->
+    <!-- GRÁFICAS -->
     <section class="charts-grid">
       <div class="chart-card">
         <h3>Progreso Hoy</h3>
         <div class="pie-chart-wrapper">
           <svg width="130" height="130" viewBox="0 0 42 42">
             <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="var(--dot-empty)" stroke-width="5"></circle>
-            <circle id="pieSegment" cx="21" cy="21" r="15.915" fill="transparent" stroke="var(--accent-color)" stroke-width="5" stroke-dasharray="0 100" style="transition: stroke-dasharray 0.5s;"></circle>
+            <circle id="pieSegment" cx="21" cy="21" r="15.915" fill="transparent" stroke="var(--accent-color)" stroke-width="5" stroke-dasharray="0 100" style="transition: stroke-dasharray 0.6s cubic-bezier(0.16, 1, 0.3, 1);"></circle>
           </svg>
           <div id="piePercent" class="pie-center-text">0%</div>
         </div>
@@ -350,15 +412,15 @@
       </div>
     </section>
 
-    <!-- SETTINGS PANEL -->
+    <!-- PANEL AJUSTES PERFIL -->
     <aside id="profilePanel" class="profile-panel hidden">
       <h3>Ajustes</h3>
       <p style="font-size: 13px;"><strong>Usuario:</strong> <span id="profileName">-</span></p>
 
-      <label style="font-size: 12px; font-weight: bold;">Seleccionar Tema (10):</label>
+      <label style="font-size: 12px; font-weight: bold;">Seleccionar Tema:</label>
       <div class="theme-selector">
         <div class="theme-dot" style="background: #ff7700;" onclick="setTheme('theme-naranja')" title="Naranja Neón"></div>
-        <div class="theme-dot" style="background: #ffd700;" onclick="setTheme('theme-dorado')" title="Dorado"></div>
+        <div id="goldThemeDot" class="theme-dot locked" style="background: #ffd700;" onclick="setTheme('theme-dorado')" title="Dorado (Requiere 365 Días)">🔒</div>
         <div class="theme-dot" style="background: #0088ff;" onclick="setTheme('theme-azul')" title="Azul Neón"></div>
         <div class="theme-dot" style="background: #00e676;" onclick="setTheme('theme-esmeralda')" title="Esmeralda"></div>
         <div class="theme-dot" style="background: #b000ff;" onclick="setTheme('theme-purpura')" title="Púrpura"></div>
@@ -422,6 +484,7 @@
     let history = JSON.parse(localStorage.getItem("trackerHistory_v2")) || {};
     let customCategories = JSON.parse(localStorage.getItem("trackerCategories_v2")) || ["Salud", "Estudio", "Personal"];
     let activeFilter = "Todos";
+    let currentStreak = 0;
 
     function getRandomQuote() { return MOTIVATIONAL_QUOTES[Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)]; }
 
@@ -432,6 +495,10 @@
     document.body.className = savedTheme;
 
     window.setTheme = (themeClass) => {
+      if (themeClass === 'theme-dorado' && currentStreak < 365) {
+        alert("🔒 El tema Dorado requiere alcanzar una racha ininterrumpida de 365 días.");
+        return;
+      }
       document.body.className = themeClass;
       localStorage.setItem("trackerTheme_v2", themeClass);
     };
@@ -551,9 +618,9 @@
       history[today] = total > 0 ? (done / total) : 0;
       localStorage.setItem("trackerHistory_v2", JSON.stringify(history));
 
+      calculateStreak();
       renderHabits();
       renderCharts();
-      calculateStreak();
     }
 
     function renderHabits() {
@@ -620,7 +687,29 @@
         } else break;
       }
 
-      document.getElementById("streakCount").textContent = streak;
+      currentStreak = streak;
+      document.getElementById("streakCount").textContent = currentStreak;
+
+      const streakContainer = document.getElementById("streakContainer");
+      if (currentStreak >= 10) {
+        streakContainer.className = "streak-tag streak-level-3";
+      } else if (currentStreak >= 4) {
+        streakContainer.className = "streak-tag streak-level-2";
+      } else {
+        streakContainer.className = "streak-tag streak-level-1";
+      }
+
+      // Desbloquear/Bloquear Tema Dorado en ajustes según la racha
+      const goldDot = document.getElementById("goldThemeDot");
+      if (currentStreak >= 365) {
+        goldDot.classList.remove("locked");
+        goldDot.textContent = "";
+        goldDot.title = "Dorado (Desbloqueado)";
+      } else {
+        goldDot.classList.add("locked");
+        goldDot.textContent = "🔒";
+        goldDot.title = "Dorado (Requiere 365 Días)";
+      }
     }
 
     document.getElementById("openProfile").addEventListener("click", () => document.getElementById("profilePanel").classList.toggle("hidden"));
