@@ -83,7 +83,6 @@
     h1 { font-size: 22px; letter-spacing: 1px; background: var(--main-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
     .settings-btn { background: var(--main-gradient); border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 700; color: #000; }
 
-    /* GAMIFICACIÓN: BARRA NIVEL XP & CONGELADOR */
     .user-gamification-bar {
       background: var(--card-bg); border: 1px solid var(--border-color);
       padding: 14px 20px; border-radius: 14px; margin-bottom: 15px;
@@ -198,7 +197,6 @@
 
     .quant-input { width: 55px; padding: 4px 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); text-align: center; font-size: 13px; }
 
-    /* SECCIÓN DE MICRO-NOTAS DIARIAS */
     .daily-notes-section {
       background: var(--card-bg); padding: 18px; border-radius: 16px;
       border: 1px solid var(--border-color); margin-bottom: 25px; display: flex; flex-direction: column; gap: 10px;
@@ -209,7 +207,6 @@
       border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; font-size: 13px; outline: none; resize: none;
     }
 
-    /* MODAL DE TEMPORIZADOR POMODORO */
     .pomo-modal {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 1000;
@@ -220,14 +217,15 @@
     .pomo-timer { font-size: 48px; font-weight: 900; margin: 15px 0; color: var(--accent-color); font-family: monospace; }
     .pomo-controls { display: flex; gap: 10px; justify-content: center; }
 
-    /* SECCIÓN DE INSIGNIAS / LOGROS */
     .badges-section {
       background: var(--card-bg); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 25px;
     }
-    .badges-section h3 { font-size: 13px; text-transform: uppercase; color: var(--accent-color); margin-bottom: 12px; }
-    .badges-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; }
+    .badges-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .badges-section h3 { font-size: 13px; text-transform: uppercase; color: var(--accent-color); }
+    .badges-counter { font-size: 12px; font-weight: bold; color: var(--gold-color); }
+    .badges-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; max-height: 380px; overflow-y: auto; padding-right: 5px; }
     .badge-card {
-      background: var(--bg-color); border: 1px solid var(--border-color); padding: 10px; border-radius: 10px; text-align: center; opacity: 0.4; filter: grayscale(1); transition: all 0.3s ease;
+      background: var(--bg-color); border: 1px solid var(--border-color); padding: 10px; border-radius: 10px; text-align: center; opacity: 0.35; filter: grayscale(1); transition: all 0.3s ease;
     }
     .badge-card.unlocked { opacity: 1; filter: grayscale(0); border-color: var(--gold-color); box-shadow: 0 0 10px rgba(255,215,0,0.2); }
     .badge-icon { font-size: 24px; margin-bottom: 4px; }
@@ -301,7 +299,6 @@
       <button id="openProfile" class="settings-btn">Ajustes</button>
     </header>
 
-    <!-- BARRA DE GAMIFICACIÓN (XP & Nivel & Congelador) -->
     <div class="user-gamification-bar">
       <div class="level-info-row">
         <span>⚡ Nivel <span id="userLevel">1</span> (<span id="userTitle">Novato</span>)</span>
@@ -369,15 +366,16 @@
       <ul id="habitList" class="habit-list"></ul>
     </section>
 
-    <!-- MICRO-NOTAS DIARIAS -->
     <section class="daily-notes-section">
       <h3>📝 Diarios y Notas del Día</h3>
       <textarea id="dailyNotesInput" placeholder="¿Cómo te has sentido hoy? ¿Qué ha ido bien o qué te ha frenado?..."></textarea>
     </section>
 
-    <!-- INSIGNIAS Y LOGROS -->
     <section class="badges-section">
-      <h3>🏆 Insignias y Logros</h3>
+      <div class="badges-header">
+        <h3>🏆 Insignias y Logros</h3>
+        <span id="badgesCounter" class="badges-counter">0 / 50</span>
+      </div>
       <div id="badgesGrid" class="badges-grid"></div>
     </section>
 
@@ -440,7 +438,6 @@
     </aside>
   </div>
 
-  <!-- MODAL POMODORO -->
   <div id="pomoModal" class="pomo-modal hidden">
     <div class="pomo-content">
       <h3 id="pomoHabitTitle" style="color: var(--accent-color); font-size: 16px;">Modo Enfoque</h3>
@@ -480,12 +477,71 @@
       "Tu único límite es la mente que te dice que no puedes."
     ];
 
+    // LISTA COMPLETA DE 50 LOGROS
     const ALL_BADGES = [
-      { id: 'first_step', icon: '🌱', title: 'Primer Paso', desc: 'Completa tu primer hábito' },
-      { id: 'streak_7', icon: '🔥', title: 'Imparable 7', desc: 'Alcanza racha de 7 días' },
-      { id: 'pomo_master', icon: '⏱️', title: 'Modo Enfoque', desc: 'Completa una sesión Pomodoro' },
-      { id: 'level_5', icon: '👑', title: 'Veterano', desc: 'Llega al Nivel 5' },
-      { id: 'note_writer', icon: '✍️', title: 'Reflexivo', desc: 'Escribe tu primera nota diaria' }
+      // RACHAS (1-10)
+      { id: 'streak_1', icon: '🐣', title: 'Nacimiento', desc: 'Consigue tu 1er día de racha' },
+      { id: 'streak_3', icon: '🔥', title: 'Chispa', desc: 'Racha de 3 días' },
+      { id: 'streak_7', icon: '⚡', title: 'Una Semana', desc: 'Racha de 7 días' },
+      { id: 'streak_14', icon: '💪', title: 'Dos Semanas', desc: 'Racha de 14 días' },
+      { id: 'streak_21', icon: '🧠', title: 'Hábito Formado', desc: 'Racha de 21 días' },
+      { id: 'streak_30', icon: '📅', title: 'Un Mes Integro', desc: 'Racha de 30 días' },
+      { id: 'streak_60', icon: '🚀', title: 'En Órbita', desc: 'Racha de 60 días' },
+      { id: 'streak_100', icon: '💯', title: 'Centenario', desc: 'Racha de 100 días' },
+      { id: 'streak_180', icon: '🛡️', title: 'Medio Año', desc: 'Racha de 180 días' },
+      { id: 'streak_365', icon: '👑', title: 'Leyenda Anual', desc: 'Racha de 365 días' },
+
+      // HÁBITOS CREADOS (11-17)
+      { id: 'create_1', icon: '🌱', title: 'Primer Semilla', desc: 'Crea tu 1er hábito' },
+      { id: 'create_3', icon: '🌿', title: 'Jardín', desc: 'Ten 3 hábitos creados' },
+      { id: 'create_5', icon: '🌳', title: 'Bosque', desc: 'Ten 5 hábitos creados' },
+      { id: 'create_10', icon: '🏛️', title: 'Arquitecto', desc: 'Ten 10 hábitos creados' },
+      { id: 'target_1', icon: '🎯', title: 'Objetivo Cuantitativo', desc: 'Crea un hábito con meta numérica' },
+      { id: 'weekdays_only', icon: '💼', title: 'Laboral', desc: 'Crea un hábito sólo de Lunes a Viernes' },
+      { id: 'weekend_hero', icon: '🏖️', title: 'Fin de Semana', desc: 'Crea un hábito de Sábado/Domingo' },
+
+      // HÁBITOS COMPLETADOS ACUMULADOS (18-26)
+      { id: 'done_1', icon: '✅', title: 'Primer Paso', desc: 'Completa 1 hábito' },
+      { id: 'done_10', icon: '🥉', title: 'Iniciado', desc: 'Completa 10 hábitos acumulados' },
+      { id: 'done_50', icon: '🥈', title: 'Constante', desc: 'Completa 50 hábitos acumulados' },
+      { id: 'done_100', icon: '🥇', title: 'Imparable', desc: 'Completa 100 hábitos acumulados' },
+      { id: 'done_250', icon: '🎖️', title: 'Veterano', desc: 'Completa 250 hábitos acumulados' },
+      { id: 'done_500', icon: '💎', title: 'Maestro', desc: 'Completa 500 hábitos acumulados' },
+      { id: 'done_1000', icon: '🔮', title: 'Transcendental', desc: 'Completa 1000 hábitos acumulados' },
+      { id: 'full_day_1', icon: '🌟', title: 'Día Perfecto', desc: 'Completa todos tus hábitos de un día' },
+      { id: 'full_day_7', icon: '🌈', title: 'Semana Perfecta', desc: 'Completa todos los hábitos 7 veces' },
+
+      // NIVEL / XP (27-34)
+      { id: 'xp_50', icon: '✨', title: 'Primeros Brillos', desc: 'Acumula 50 XP' },
+      { id: 'xp_200', icon: '⭐', title: 'Estrella Naciente', desc: 'Acumula 200 XP' },
+      { id: 'xp_500', icon: '🌟', title: 'Prodigio', desc: 'Acumula 500 XP' },
+      { id: 'xp_1000', icon: '💫', title: 'Fuerza Imparable', desc: 'Acumula 1,000 XP' },
+      { id: 'lvl_2', icon: '⬆️', title: 'Nivel 2', desc: 'Alcanza el Nivel 2' },
+      { id: 'lvl_5', icon: '🛡️', title: 'Nivel 5', desc: 'Alcanza el Nivel 5' },
+      { id: 'lvl_10', icon: '👑', title: 'Nivel 10', desc: 'Alcanza el Nivel 10' },
+      { id: 'lvl_20', icon: '🐉', title: 'Nivel 20', desc: 'Alcanza el Nivel 20' },
+
+      // TEMPORIZADOR POMODORO (35-40)
+      { id: 'pomo_1', icon: '⏱️', title: 'Primer Enfoque', desc: 'Completa 1 sesión Pomodoro' },
+      { id: 'pomo_5', icon: '⌛', title: 'Concentrado', desc: 'Completa 5 Pomodoros' },
+      { id: 'pomo_10', icon: '🧠', title: 'Deep Work', desc: 'Completa 10 Pomodoros' },
+      { id: 'pomo_25', icon: '🔥', title: 'Hiper-Enfoque', desc: 'Completa 25 Pomodoros' },
+      { id: 'pomo_50', icon: '🚀', title: 'Productivo', desc: 'Completa 50 Pomodoros' },
+      { id: 'pomo_100', icon: '🏆', title: 'Titán del Enfoque', desc: 'Completa 100 Pomodoros' },
+
+      // DIARIOS Y NOTAS (41-45)
+      { id: 'note_1', icon: '✍️', title: 'Primer Diario', desc: 'Escribe tu primera nota diaria' },
+      { id: 'note_5', icon: '📖', title: 'Escribano', desc: 'Escribe notas en 5 días diferentes' },
+      { id: 'note_15', icon: '📚', title: 'Biógrafo', desc: 'Escribe notas en 15 días diferentes' },
+      { id: 'note_30', icon: '🖊️', title: 'Filósofo', desc: 'Escribe notas en 30 días diferentes' },
+      { id: 'note_long', icon: '📜', title: 'Inspiración', desc: 'Escribe una nota de más de 100 caracteres' },
+
+      // EXTRAS Y GAMIFICACIÓN (46-50)
+      { id: 'freeze_1', icon: '🧊', title: 'Bajo Cero', desc: 'Usa por primera vez un Congelador' },
+      { id: 'cat_new', icon: '🏷️', title: 'Organizador', desc: 'Crea una categoría personalizada' },
+      { id: 'theme_change', icon: '🎨', title: 'Camaleón', desc: 'Cambia el tema visual de la app' },
+      { id: 'export_data', icon: '💾', title: 'Precavido', desc: 'Exporta tus datos en archivo JSON' },
+      { id: 'all_badges', icon: '🌌', title: 'Omnipotente', desc: 'Desbloquea 45 o más insignias' }
     ];
 
     let user = null;
@@ -495,13 +551,13 @@
     let userXp = 0;
     let streakFrozenDate = null;
     let unlockedBadges = [];
+    let pomosCompleted = 0;
 
     let customCategories = ["Salud", "Estudio", "Personal"];
     let activeFilter = "Todos";
     let currentStreak = 0;
     let wasAllCompletedToday = false;
 
-    // AUDIO
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playSound(type) {
       if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -551,10 +607,10 @@
       }
       document.body.className = themeClass;
       localStorage.setItem("trackerTheme_v2", themeClass);
+      unlockBadge('theme_change');
       saveToCloud();
     };
 
-    // SELECCIÓN DE DÍAS
     const dayNamesFull = { 1: "Lunes", 2: "Martes", 3: "Miércoles", 4: "Jueves", 5: "Viernes", 6: "Sábado", 0: "Domingo" };
 
     function updateDaysHelperText() {
@@ -598,22 +654,82 @@
       updateDaysHelperText();
     });
 
-    // SISTEMA XP Y LOGROS
     function addXp(amount) {
       userXp = Math.max(0, userXp + amount);
       renderGamification();
     }
 
     function checkBadges() {
-      const totalDone = habits.reduce((acc, h) => acc + (h.streak || 0), 0);
-      if (totalDone > 0) unlockBadge('first_step');
-      if (currentStreak >= 7) unlockBadge('streak_7');
-      
+      const totalHabitsCount = habits.length;
+      const totalCompletedCompletions = habits.reduce((acc, h) => acc + (h.streak || 0), 0);
       const level = Math.floor(userXp / 100) + 1;
-      if (level >= 5) unlockBadge('level_5');
-
+      const notesDaysCount = Object.keys(dailyNotes).filter(k => dailyNotes[k] && dailyNotes[k].trim() !== '').length;
       const today = new Date().toISOString().split('T')[0];
-      if (dailyNotes[today] && dailyNotes[today].trim() !== '') unlockBadge('note_writer');
+      const todayNote = dailyNotes[today] || '';
+
+      // Rachas
+      if (currentStreak >= 1) unlockBadge('streak_1');
+      if (currentStreak >= 3) unlockBadge('streak_3');
+      if (currentStreak >= 7) unlockBadge('streak_7');
+      if (currentStreak >= 14) unlockBadge('streak_14');
+      if (currentStreak >= 21) unlockBadge('streak_21');
+      if (currentStreak >= 30) unlockBadge('streak_30');
+      if (currentStreak >= 60) unlockBadge('streak_60');
+      if (currentStreak >= 100) unlockBadge('streak_100');
+      if (currentStreak >= 180) unlockBadge('streak_180');
+      if (currentStreak >= 365) unlockBadge('streak_365');
+
+      // Hábitos creados
+      if (totalHabitsCount >= 1) unlockBadge('create_1');
+      if (totalHabitsCount >= 3) unlockBadge('create_3');
+      if (totalHabitsCount >= 5) unlockBadge('create_5');
+      if (totalHabitsCount >= 10) unlockBadge('create_10');
+      if (habits.some(h => h.target)) unlockBadge('target_1');
+      if (habits.some(h => h.days && h.days.length === 5 && h.days.every(d => d >= 1 && d <= 5))) unlockBadge('weekdays_only');
+      if (habits.some(h => h.days && (h.days.includes(6) || h.days.includes(0)))) unlockBadge('weekend_hero');
+
+      // Completados
+      if (totalCompletedCompletions >= 1) unlockBadge('done_1');
+      if (totalCompletedCompletions >= 10) unlockBadge('done_10');
+      if (totalCompletedCompletions >= 50) unlockBadge('done_50');
+      if (totalCompletedCompletions >= 100) unlockBadge('done_100');
+      if (totalCompletedCompletions >= 250) unlockBadge('done_250');
+      if (totalCompletedCompletions >= 500) unlockBadge('done_500');
+      if (totalCompletedCompletions >= 1000) unlockBadge('done_1000');
+      
+      const perfectDaysCount = Object.values(history).filter(v => v === 1).length;
+      if (perfectDaysCount >= 1) unlockBadge('full_day_1');
+      if (perfectDaysCount >= 7) unlockBadge('full_day_7');
+
+      // XP / Niveles
+      if (userXp >= 50) unlockBadge('xp_50');
+      if (userXp >= 200) unlockBadge('xp_200');
+      if (userXp >= 500) unlockBadge('xp_500');
+      if (userXp >= 1000) unlockBadge('xp_1000');
+      if (level >= 2) unlockBadge('lvl_2');
+      if (level >= 5) unlockBadge('lvl_5');
+      if (level >= 10) unlockBadge('lvl_10');
+      if (level >= 20) unlockBadge('lvl_20');
+
+      // Pomodoros
+      if (pomosCompleted >= 1) unlockBadge('pomo_1');
+      if (pomosCompleted >= 5) unlockBadge('pomo_5');
+      if (pomosCompleted >= 10) unlockBadge('pomo_10');
+      if (pomosCompleted >= 25) unlockBadge('pomo_25');
+      if (pomosCompleted >= 50) unlockBadge('pomo_50');
+      if (pomosCompleted >= 100) unlockBadge('pomo_100');
+
+      // Notas
+      if (notesDaysCount >= 1) unlockBadge('note_1');
+      if (notesDaysCount >= 5) unlockBadge('note_5');
+      if (notesDaysCount >= 15) unlockBadge('note_15');
+      if (notesDaysCount >= 30) unlockBadge('note_30');
+      if (todayNote.length >= 100) unlockBadge('note_long');
+
+      // Extras
+      if (streakFrozenDate) unlockBadge('freeze_1');
+      if (customCategories.length > 3) unlockBadge('cat_new');
+      if (unlockedBadges.length >= 45) unlockBadge('all_badges');
     }
 
     function unlockBadge(badgeId) {
@@ -628,7 +744,7 @@
       const level = Math.floor(userXp / 100) + 1;
       const xpCurrent = userXp % 100;
 
-      const titles = ["Novato", "Constante", "Disciplinado", "Maestro", "Imparable", "Leyenda"];
+      const titles = ["Novato", "Constante", "Disciplinado", "Maestro", "Imparable", "Leyenda", "Semidios", "Titan"];
       const title = titles[Math.min(level - 1, titles.length - 1)];
 
       document.getElementById("userLevel").textContent = level;
@@ -652,10 +768,12 @@
 
     function renderBadges() {
       const container = document.getElementById("badgesGrid");
+      document.getElementById("badgesCounter").textContent = `${unlockedBadges.length} / ${ALL_BADGES.length}`;
+      
       container.innerHTML = ALL_BADGES.map(b => {
         const isUnlocked = unlockedBadges.includes(b.id);
         return `
-          <div class="badge-card ${isUnlocked ? 'unlocked' : ''}">
+          <div class="badge-card ${isUnlocked ? 'unlocked' : ''}" title="${b.desc}">
             <div class="badge-icon">${b.icon}</div>
             <div class="badge-title">${b.title}</div>
             <div class="badge-desc">${b.desc}</div>
@@ -669,19 +787,20 @@
       if (streakFrozenDate === today) return alert("❄️ Ya has congelado tu racha el día de hoy.");
       if (confirm("¿Quieres usar 1 comodín para proteger tu racha hoy aunque no completes tus hábitos?")) {
         streakFrozenDate = today;
+        unlockBadge('freeze_1');
         saveToCloud();
         renderGamification();
         calculateStreak();
       }
     });
 
-    // MICRO-NOTAS
     const dailyNotesInput = document.getElementById("dailyNotesInput");
     dailyNotesInput.addEventListener("input", (e) => {
       const today = new Date().toISOString().split('T')[0];
       dailyNotes[today] = e.target.value;
       saveToCloud();
       checkBadges();
+      renderBadges();
     });
 
     function loadDailyNote() {
@@ -689,7 +808,6 @@
       dailyNotesInput.value = dailyNotes[today] || "";
     }
 
-    // TEMPORIZADOR POMODORO
     let pomoInterval = null;
     let pomoTimeLeft = 25 * 60;
     let currentPomoHabitId = null;
@@ -731,7 +849,9 @@
             pomoInterval = null;
             playSound('fanfare');
             addXp(25);
-            unlockBadge('pomo_master');
+            pomosCompleted++;
+            checkBadges();
+            saveToCloud();
             alert("🎉 ¡Sesión Pomodoro completada! (+25 XP)");
             if (currentPomoHabitId) toggleHabit(currentPomoHabitId);
             document.getElementById("pomoModal").classList.add("hidden");
@@ -759,6 +879,7 @@
         userXp = data.userXp || 0;
         streakFrozenDate = data.streakFrozenDate || null;
         unlockedBadges = data.unlockedBadges || [];
+        pomosCompleted = data.pomosCompleted || 0;
         customCategories = data.categories || ["Salud", "Estudio", "Personal"];
         if (data.theme) setTheme(data.theme);
       } else {
@@ -768,6 +889,7 @@
         userXp = JSON.parse(localStorage.getItem("trackerXp_v2")) || 0;
         streakFrozenDate = localStorage.getItem("trackerFreeze_v2") || null;
         unlockedBadges = JSON.parse(localStorage.getItem("trackerBadges_v2")) || [];
+        pomosCompleted = JSON.parse(localStorage.getItem("trackerPomos_v2")) || 0;
         customCategories = JSON.parse(localStorage.getItem("trackerCategories_v2")) || ["Salud", "Estudio", "Personal"];
       }
       checkDailyReset();
@@ -784,12 +906,13 @@
       localStorage.setItem("trackerXp_v2", JSON.stringify(userXp));
       if (streakFrozenDate) localStorage.setItem("trackerFreeze_v2", streakFrozenDate);
       localStorage.setItem("trackerBadges_v2", JSON.stringify(unlockedBadges));
+      localStorage.setItem("trackerPomos_v2", JSON.stringify(pomosCompleted));
       localStorage.setItem("trackerCategories_v2", JSON.stringify(customCategories));
 
       if (user) {
         const docId = user.email.replace(/[^a-zA-Z0-9]/g, "_");
         await setDoc(doc(db, "userData", docId), {
-          habits, history, dailyNotes, userXp, streakFrozenDate, unlockedBadges,
+          habits, history, dailyNotes, userXp, streakFrozenDate, unlockedBadges, pomosCompleted,
           categories: customCategories,
           theme: localStorage.getItem("trackerTheme_v2") || "theme-naranja"
         }, { merge: true });
@@ -848,6 +971,7 @@
         if (newCat && newCat.trim() !== "") {
           const formatted = newCat.trim();
           if (!customCategories.includes(formatted)) customCategories.push(formatted);
+          unlockBadge('cat_new');
           renderCategoryOptions();
           categorySelect.value = formatted;
         } else {
@@ -958,9 +1082,11 @@
         wasAllCompletedToday = false;
       }
 
+      calculateStreak();
+      checkBadges();
+
       if (triggerCloud) saveToCloud();
 
-      calculateStreak();
       renderGamification();
       renderHabits();
       renderCharts();
@@ -1173,7 +1299,8 @@
     }
 
     document.getElementById("exportJsonBtn").addEventListener("click", () => {
-      const exportData = { habits, history, dailyNotes, userXp, streakFrozenDate, unlockedBadges, categories: customCategories, theme: localStorage.getItem("trackerTheme_v2") || "theme-naranja" };
+      unlockBadge('export_data');
+      const exportData = { habits, history, dailyNotes, userXp, streakFrozenDate, unlockedBadges, pomosCompleted, categories: customCategories, theme: localStorage.getItem("trackerTheme_v2") || "theme-naranja" };
       const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -1200,6 +1327,7 @@
             if (imported.userXp !== undefined) userXp = imported.userXp;
             if (imported.streakFrozenDate) streakFrozenDate = imported.streakFrozenDate;
             if (imported.unlockedBadges) unlockedBadges = imported.unlockedBadges;
+            if (imported.pomosCompleted !== undefined) pomosCompleted = imported.pomosCompleted;
             if (imported.categories) customCategories = imported.categories;
             if (imported.theme) setTheme(imported.theme);
 
