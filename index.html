@@ -118,26 +118,95 @@
       border: 1px solid var(--border-color); margin-bottom: 25px;
     }
 
-    .add-habit-box { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+    .add-habit-box { display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px; }
     .add-habit-row { display: flex; gap: 10px; flex-wrap: wrap; }
     .add-habit-box input, .add-habit-box select {
       padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-color);
       background: var(--bg-color); color: var(--text-color); outline: none;
     }
     .add-habit-box input[type="text"] { flex: 2; min-width: 180px; }
-    .add-habit-box input[type="number"] { width: 100px; }
+    .add-habit-box input[type="number"] { width: 110px; }
     .add-habit-box button {
       padding: 12px 20px; background: var(--main-gradient); border: none;
       border-radius: 8px; cursor: pointer; font-weight: 800; color: #000;
     }
 
-    .days-picker { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
-    .day-btn {
-      width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border-color);
-      background: var(--bg-color); color: var(--text-muted); cursor: pointer;
-      font-size: 11px; font-weight: bold; display: flex; align-items: center; justify-content: center;
+    /* MEJORA EN SELECCIÓN DE DÍAS DE LA SEMANA */
+    .days-picker-wrapper {
+      background: var(--bg-color);
+      padding: 12px 15px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
-    .day-btn.selected { background: var(--accent-color); color: #000; border-color: var(--accent-color); }
+
+    .days-picker-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+
+    .days-picker-title {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .days-picker-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .day-quick-btn {
+      background: transparent;
+      border: none;
+      color: var(--accent-color);
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .days-picker {
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+    }
+
+    .day-btn {
+      flex: 1;
+      height: 36px;
+      border-radius: 8px;
+      border: 2px solid var(--border-color);
+      background: var(--card-bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .day-btn:hover {
+      border-color: var(--border-bright);
+    }
+
+    .day-btn.selected {
+      background: var(--main-gradient);
+      color: #000;
+      border-color: transparent;
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .days-helper-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
 
     .filters-bar { display: flex; gap: 8px; margin-bottom: 18px; overflow-x: auto; padding-bottom: 4px; }
     .filter-btn { padding: 6px 16px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 20px; cursor: pointer; font-size: 13px; }
@@ -154,6 +223,12 @@
     .habit-item:active { cursor: grabbing; }
     .habit-item.dragging { opacity: 0.4; border: 2px dashed var(--accent-color); }
 
+    .habit-item.not-today {
+      opacity: 0.55;
+      background: var(--bg-color);
+      border-style: dashed;
+    }
+
     .habit-item.completed {
       background: rgba(76, 209, 55, 0.15) !important;
       border-color: #4cd137 !important;
@@ -161,12 +236,30 @@
     }
     .habit-item.completed .habit-title { text-decoration: line-through; opacity: 0.8; }
 
-    .habit-details { display: flex; flex-direction: column; gap: 3px; }
+    .habit-details { display: flex; flex-direction: column; gap: 4px; }
     .habit-title-row { display: flex; align-items: center; gap: 8px; }
     .habit-title { font-size: 15px; font-weight: 600; color: var(--text-color); }
     .habit-streak-badge { font-size: 11px; font-weight: 800; color: #ff9900; background: rgba(255, 153, 0, 0.15); padding: 2px 6px; border-radius: 10px; }
     .habit-category-subtitle { font-size: 12px; font-weight: 700; color: var(--accent-color); }
-    .habit-days-subtitle { font-size: 10px; color: var(--text-muted); }
+    
+    .habit-days-pills { display: flex; gap: 4px; margin-top: 2px; }
+    .mini-day-pill {
+      font-size: 10px;
+      font-weight: bold;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: var(--bg-color);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+    }
+    .mini-day-pill.active-day {
+      background: var(--accent-color);
+      color: #000;
+      border-color: var(--accent-color);
+    }
+    .mini-day-pill.is-today-pill {
+      box-shadow: 0 0 5px var(--accent-glow);
+    }
 
     .habit-actions { display: flex; align-items: center; gap: 6px; }
     .btn-action {
@@ -284,15 +377,27 @@
           <input type="number" id="habitTarget" placeholder="Meta (ej: 2000)" min="1">
           <button id="addHabitBtn">Añadir</button>
         </div>
-        <div class="days-picker">
-          <span style="font-size:12px; color:var(--text-muted); margin-right:4px;">Días:</span>
-          <button class="day-btn selected" data-day="1">L</button>
-          <button class="day-btn selected" data-day="2">M</button>
-          <button class="day-btn selected" data-day="3">X</button>
-          <button class="day-btn selected" data-day="4">J</button>
-          <button class="day-btn selected" data-day="5">V</button>
-          <button class="day-btn selected" data-day="6">S</button>
-          <button class="day-btn selected" data-day="0">D</button>
+
+        <!-- PANEL DE SELECCIÓN DE DÍAS RESTRDiseñado -->
+        <div class="days-picker-wrapper">
+          <div class="days-picker-header">
+            <span class="days-picker-title">🗓️ Programación semanal (días activos):</span>
+            <div class="days-picker-actions">
+              <button class="day-quick-btn" id="selectDaily">Todos</button>
+              <button class="day-quick-btn" id="selectWeekdays">L-V</button>
+              <button class="day-quick-btn" id="clearDays">Limpiar</button>
+            </div>
+          </div>
+          <div class="days-picker">
+            <button class="day-btn selected" data-day="1">Lun</button>
+            <button class="day-btn selected" data-day="2">Mar</button>
+            <button class="day-btn selected" data-day="3">Mié</button>
+            <button class="day-btn selected" data-day="4">Jue</button>
+            <button class="day-btn selected" data-day="5">Vie</button>
+            <button class="day-btn selected" data-day="6">Sáb</button>
+            <button class="day-btn selected" data-day="0">Dom</button>
+          </div>
+          <span class="days-helper-text" id="daysHelperText">Hábito programado para: Todos los días de la semana.</span>
         </div>
       </div>
 
@@ -395,7 +500,7 @@
     let currentStreak = 0;
     let wasAllCompletedToday = false;
 
-    // MOTOR AUDIO WEB SINTÉTICO (SIN ARCHIVOS EXTERNOS)
+    // MOTOR AUDIO WEB SINTÉTICO
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playSound(type) {
       if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -405,8 +510,8 @@
       gain.connect(audioCtx.destination);
 
       if (type === 'check') {
-        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
-        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1); // A5
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1);
         gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
         osc.start();
@@ -451,9 +556,48 @@
       saveToCloud();
     };
 
-    // BOTONES SELECCIÓN DÍAS
+    // LÓGICA Y FEEDBACK MEJORADO PARA DÍAS
+    const dayNamesFull = { 1: "Lunes", 2: "Martes", 3: "Miércoles", 4: "Jueves", 5: "Viernes", 6: "Sábado", 0: "Domingo" };
+
+    function updateDaysHelperText() {
+      const selectedBtns = document.querySelectorAll(".day-btn.selected");
+      const helper = document.getElementById("daysHelperText");
+      if (selectedBtns.length === 7) {
+        helper.textContent = "Hábito programado para: Todos los días de la semana.";
+      } else if (selectedBtns.length === 0) {
+        helper.textContent = "⚠️ Atencion: Debes seleccionar al menos un día.";
+      } else if (selectedBtns.length === 5 && Array.from(selectedBtns).every(b => b.dataset.day >= 1 && b.dataset.day <= 5)) {
+        helper.textContent = "Hábito programado para: Días laborables (Lunes a Viernes).";
+      } else {
+        const selectedNames = Array.from(selectedBtns).map(b => dayNamesFull[b.dataset.day]);
+        helper.textContent = `Hábito programado para: ${selectedNames.join(", ")}.`;
+      }
+    }
+
     document.querySelectorAll(".day-btn").forEach(btn => {
-      btn.addEventListener("click", () => btn.classList.toggle("selected"));
+      btn.addEventListener("click", () => {
+        btn.classList.toggle("selected");
+        updateDaysHelperText();
+      });
+    });
+
+    document.getElementById("selectDaily").addEventListener("click", () => {
+      document.querySelectorAll(".day-btn").forEach(b => b.classList.add("selected"));
+      updateDaysHelperText();
+    });
+
+    document.getElementById("selectWeekdays").addEventListener("click", () => {
+      document.querySelectorAll(".day-btn").forEach(b => {
+        const day = parseInt(b.dataset.day);
+        if (day >= 1 && day <= 5) b.classList.add("selected");
+        else b.classList.remove("selected");
+      });
+      updateDaysHelperText();
+    });
+
+    document.getElementById("clearDays").addEventListener("click", () => {
+      document.querySelectorAll(".day-btn").forEach(b => b.classList.remove("selected"));
+      updateDaysHelperText();
     });
 
     async function syncFromCloud() {
@@ -500,7 +644,7 @@
         habits = habits.map(h => {
           const wasDone = h.completed || (h.target && h.current >= h.target);
           let newStreak = h.streak || 0;
-          if (!wasDone) newStreak = 0; // Se interrumpe la racha individual si no se completó
+          if (!wasDone) newStreak = 0;
           return { ...h, completed: false, current: 0, streak: newStreak };
         });
         localStorage.setItem("trackerLastDate_v2", today);
@@ -521,14 +665,14 @@
     document.getElementById("loginBtn").addEventListener("click", async () => {
       const email = document.getElementById("loginEmail").value.trim().toLowerCase();
       const pass = document.getElementById("loginPass").value.trim();
-      if (!email || !pass) return alert("Por favor introduce correo y contraseña");
+      if (!email || !pass) return alert("⚠️ Por favor introduce correo y contraseña.");
 
       const docId = email.replace(/[^a-zA-Z0-9]/g, "_");
       const ref = doc(db, "users", docId);
       const snap = await getDoc(ref);
 
       if (snap.exists()) {
-        if (snap.data().password !== pass) return alert("Contraseña incorrecta");
+        if (snap.data().password !== pass) return alert("⚠️ Contraseña incorrecta.");
       } else {
         await setDoc(ref, { email: email, password: pass });
       }
@@ -571,7 +715,8 @@
       const selectedDays = [];
       document.querySelectorAll(".day-btn.selected").forEach(b => selectedDays.push(parseInt(b.dataset.day)));
 
-      if (!text || cat === "__NEW__" || selectedDays.length === 0) return alert("Rellena el nombre del hábito y selecciona al menos 1 día.");
+      if (!text) return alert("⚠️ Asigna un nombre al hábito.");
+      if (selectedDays.length === 0) return alert("⚠️ Selecciona al menos un día de la semana para programar el hábito.");
 
       habits.push({
         id: Date.now(),
@@ -622,8 +767,10 @@
     };
 
     window.deleteHabit = (id) => {
-      habits = habits.filter(h => h.id !== id);
-      saveAndRender();
+      if (confirm("¿Estás seguro de que deseas eliminar este hábito?")) {
+        habits = habits.filter(h => h.id !== id);
+        saveAndRender();
+      }
     };
 
     window.setFilter = (cat) => {
@@ -642,7 +789,6 @@
 
       history[today] = total > 0 ? (done / total) : 0;
 
-      // CONFETI Y FANFARRIA AL COMPLETAR TODO HOY
       if (total > 0 && done === total) {
         if (!wasAllCompletedToday) {
           confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
@@ -660,38 +806,49 @@
       renderCharts();
     }
 
-    const dayLabels = { 1: "L", 2: "M", 3: "X", 4: "J", 5: "V", 6: "S", 0: "D" };
+    const dayLabelsShort = [
+      { id: 1, label: "L" }, { id: 2, label: "M" }, { id: 3, label: "X" },
+      { id: 4, label: "J" }, { id: 5, label: "V" }, { id: 6, label: "S" }, { id: 0, label: "D" }
+    ];
 
     function renderHabits() {
       const todayDayOfWeek = new Date().getDay();
       const habitList = document.getElementById("habitList");
       
-      const filtered = habits.filter(h => {
-        if (activeFilter !== "Todos" && h.category !== activeFilter) return false;
-        return true;
-      });
+      const filtered = habits.filter(h => activeFilter === "Todos" || h.category === activeFilter);
+
+      if (filtered.length === 0) {
+        habitList.innerHTML = `<li style="text-align:center; padding: 20px; color: var(--text-muted); font-size: 13px;">Sin hábitos en esta categoría.</li>`;
+        return;
+      }
 
       habitList.innerHTML = filtered.map(h => {
         const isScheduledToday = !h.days || h.days.includes(todayDayOfWeek);
         const isDone = h.completed || (h.target && h.current >= h.target);
-        const daysFormatted = h.days ? h.days.map(d => dayLabels[d]).join(' ') : 'Todos';
+
+        // Renderizado de minipastillas visuales de días
+        const daysPills = dayLabelsShort.map(d => {
+          const isActive = h.days.includes(d.id);
+          const isToday = d.id === todayDayOfWeek;
+          return `<span class="mini-day-pill ${isActive ? 'active-day' : ''} ${isToday ? 'is-today-pill' : ''}">${d.label}</span>`;
+        }).join('');
 
         return `
-          <li id="habit-${h.id}" class="habit-item ${isDone ? 'completed' : ''}" draggable="true">
+          <li id="habit-${h.id}" class="habit-item ${!isScheduledToday ? 'not-today' : ''} ${isDone ? 'completed' : ''}" draggable="true">
             <div class="habit-details">
               <div class="habit-title-row">
-                <span class="habit-title" style="${!isScheduledToday ? 'opacity: 0.6;' : ''}">${h.name}</span>
+                <span class="habit-title">${h.name}</span>
                 ${h.streak ? `<span class="habit-streak-badge">🔥 ${h.streak}d</span>` : ''}
               </div>
-              <span class="habit-category-subtitle">${h.category}</span>
-              <span class="habit-days-subtitle">📅 ${daysFormatted} ${!isScheduledToday ? '(No hoy)' : ''}</span>
+              <span class="habit-category-subtitle">${h.category} ${!isScheduledToday ? '• <i style="color:var(--text-muted); font-weight:normal;">(Inactivo hoy)</i>' : ''}</span>
+              <div class="habit-days-pills">${daysPills}</div>
             </div>
             <div class="habit-actions">
               ${h.target ? `
-                <input type="number" class="quant-input" value="${h.current || 0}" max="${h.target}" onchange="updateQuant(${h.id}, this.value)">
+                <input type="number" class="quant-input" value="${h.current || 0}" max="${h.target}" onchange="updateQuant(${h.id}, this.value)" ${!isScheduledToday ? 'disabled' : ''}>
                 <span style="font-size: 12px; color: var(--text-muted);">/ ${h.target}</span>
               ` : `
-                <button class="btn-action ${isDone ? 'check' : ''}" onclick="toggleHabit(${h.id})">${isDone ? '✓' : '◯'}</button>
+                <button class="btn-action ${isDone ? 'check' : ''}" onclick="toggleHabit(${h.id})" ${!isScheduledToday ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}>${isDone ? '✓' : '◯'}</button>
               `}
               <button class="btn-action delete" onclick="deleteHabit(${h.id})">✕</button>
             </div>
@@ -702,7 +859,6 @@
       setupDragAndDrop();
     }
 
-    // ARRASTRAR Y REORDENAR (DRAG & DROP)
     function setupDragAndDrop() {
       const list = document.getElementById("habitList");
       let draggedItem = null;
@@ -717,7 +873,6 @@
           item.classList.remove("dragging");
           draggedItem = null;
 
-          // Guardar el nuevo orden de los IDs
           const newOrderIds = Array.from(list.querySelectorAll(".habit-item")).map(el => parseInt(el.id.replace("habit-", "")));
           habits.sort((a, b) => newOrderIds.indexOf(a.id) - newOrderIds.indexOf(b.id));
           saveToCloud();
@@ -887,14 +1042,19 @@
             saveAndRender();
             alert("¡Datos importados y sincronizados correctamente!");
           }
-        } catch (err) { alert("Error al procesar el archivo JSON."); }
+        } catch (err) { alert("⚠️ Error al procesar el archivo JSON."); }
       };
       reader.readAsText(file);
     });
 
     document.getElementById("openProfile").addEventListener("click", () => document.getElementById("profilePanel").classList.toggle("hidden"));
     document.getElementById("closeProfile").addEventListener("click", () => document.getElementById("profilePanel").classList.add("hidden"));
-    document.getElementById("clearLocal").addEventListener("click", () => { localStorage.clear(); location.reload(); });
+    document.getElementById("clearLocal").addEventListener("click", () => {
+      if (confirm("¿Estás seguro de cerrar sesión?")) {
+        localStorage.clear();
+        location.reload();
+      }
+    });
   </script>
 </body>
 </html>
