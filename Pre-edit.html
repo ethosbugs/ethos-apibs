@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://*.firebaseio.com; img-src 'self' https: data:;">
+  <link rel="icon" type="image/png" href="https://cdn3d.iconscout.com/3d/premium/thumb/grafico-ascendente-3d-icon-png-download-12761031.png">
+  <title>Habit & Discipline Tracker - Ethos</title>
+
+  <style>
+    /* VARIABLES Y TEMAS */
+    :root {
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --text-color: #ffffff;
+      --accent-color: #ffcc00;
+      --accent-hover: #e6b800;
+      --border-color: #333333;
+      --dot-empty: #2a2a2a;
+    }
+
+    body.theme-neon {
+      --bg-color: #0d0221;
+      --card-bg: #0f0826;
+      --text-color: #00f5d4;
+      --accent-color: #7b2cbf;
+      --accent-hover: #9d4edd;
+      --border-color: #5a189a;
+      --dot-empty: #190938;
+    }
+
+    body.theme-light {
+      --bg-color: #f4f6f8;
+      --card-bg: #ffffff;
+      --text-color: #222222;
+      --accent-color: #2563eb;
+      --accent-hover: #1d4ed8;
+      --border-color: #e5e7eb;
+      --dot-empty: #e2e8f0;
+    }
+
+    body.theme-gold {
+      --bg-color: #141100;
+      --card-bg: #241e00;
+      --text-color: #fff8d6;
+      --accent-color: #ffd700;
+      --accent-hover: #ffae00;
+      --border-color: #665200;
+      --dot-empty: #332900;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .hidden { display: none !important; }
+
+    /* MODAL AUTENTICACIÓN */
+    .auth-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .auth-modal {
+      position: relative;
+      background: var(--card-bg);
+      padding: 35px 25px 25px 25px;
+      border-radius: 12px;
+      border: 2px solid var(--accent-color);
+      text-align: center;
+      width: 340px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .ethos-badge {
+      position: absolute;
+      top: -14px;
+      left: 15px;
+      background: #000;
+      border: 1px solid var(--accent-color);
+      border-radius: 20px;
+      padding: 3px 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      font-weight: bold;
+      color: #fff;
+    }
+    .ethos-badge img {
+      width: 14px;
+      height: 14px;
+      object-fit: contain;
+    }
+
+    .auth-subtitle {
+      font-size: 12px;
+      margin-top: 10px;
+      margin-bottom: 5px;
+      font-style: italic;
+      opacity: 0.9;
+      color: var(--accent-color);
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-panel { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+    .auth-panel input { padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); }
+    .auth-primary { padding: 10px; background: var(--accent-color); border: none; font-weight: bold; cursor: pointer; border-radius: 6px; }
+
+    /* CONTENEDOR PRINCIPAL */
+    .main-container { width: 100%; max-width: 750px; padding: 20px; flex: 1; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .settings-btn { background: var(--accent-color); border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+    /* BARRA DE MOTIVACIÓN Y RACHA */
+    .motivation-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 12px 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+    .streak-tag {
+      background: rgba(255, 204, 0, 0.15);
+      color: var(--accent-color);
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .streak-icon {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
+
+    /* SECCIÓN HÁBITOS Y FILTROS */
+    .habits-section {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .add-habit-box { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+    .add-habit-box input { flex: 2; min-width: 150px; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); }
+    .add-habit-box select { padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); }
+    .add-habit-box button { padding: 10px 15px; background: var(--accent-color); border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+    .filters-bar { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+    .filter-btn { padding: 5px 12px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 15px; cursor: pointer; font-size: 12px; white-space: nowrap; }
+    .filter-btn.active { background: var(--accent-color); color: #000; font-weight: bold; }
+
+    .habit-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .habit-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px; background: var(--bg-color); border-radius: 8px;
+      border: 1px solid var(--border-color);
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    .habit-item:hover { transform: translateY(-2px); }
+    .habit-item.completed { opacity: 0.6; }
+    .habit-item.completed span { text-decoration: line-through; }
+
+    /* SECCIÓN GRÁFICOS */
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    @media (max-width: 600px) { .charts-grid { grid-template-columns: 1fr; } }
+
+    .chart-card {
+      background: var(--card-bg); padding: 20px; border-radius: 12px;
+      border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center;
+    }
+    .chart-card.full-width { grid-column: 1 / -1; width: 100%; }
+    .chart-card h3 { margin-bottom: 15px; font-size: 14px; text-transform: uppercase; opacity: 0.8; }
+
+    /* GRÁFICO CIRCULAR */
+    .pie-chart-wrapper { position: relative; width: 120px; height: 120px; }
+    .pie-chart-wrapper svg { transform: rotate(-90deg); border-radius: 50%; }
+    #pieSegment { transition: stroke-dasharray 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+    .pie-center-text {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 18px;
+    }
+
+    /* GRÁFICO DE LÍNEAS MENSUAL */
+    .line-chart-container {
+      width: 100%;
+      height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .line-chart-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    /* MAPA ANUAL DE ACTIVIDAD (365 DÍAS DE IZQUIERDA A DERECHA) */
+    .year-grid-container {
+      width: 100%;
+      overflow-x: auto;
+      padding-bottom: 10px;
+    }
+    .year-grid {
+      display: grid;
+      grid-template-rows: repeat(7, 12px);
+      grid-auto-flow: column;
+      grid-auto-columns: 12px;
+      gap: 3px;
+    }
+    .year-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      background: var(--dot-empty);
+    }
+    .year-dot.lvl-1 { background: rgba(255, 204, 0, 0.3); }
+    .year-dot.lvl-2 { background: rgba(255, 204, 0, 0.6); }
+    .year-dot.lvl-3 { background: var(--accent-color); }
+
+    /* PERFIL Y AJUSTES */
+    .profile-panel {
+      position: fixed; top: 70px; right: 20px;
+      background: var(--card-bg); border: 1px solid var(--border-color);
+      padding: 20px; border-radius: 10px; display: flex; flex-direction: column;
+      gap: 12px; z-index: 100; width: 260px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+    .theme-select { padding: 8px; border-radius: 4px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); }
+    .theme-btn { padding: 8px; background: var(--accent-color); border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .json-btn { padding: 8px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; cursor: pointer; font-size: 12px; }
+
+    .creators-footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 13px;
+      color: var(--text-color);
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body class="theme-default">
+
+  <!-- MODAL AUTENTICACIÓN -->
+  <div id="authOverlay" class="auth-overlay">
+    <div class="auth-modal">
+
+        <div class="ethos-badge">
+          <img src="https://hackaday.com/wp-content/uploads/2016/08/google-g-logo.png" alt="Google Logo">
+          <span>Verificado por Google</span>
+        <img src="https://cdn-icons-png.flaticon.com/512/1828/1828640.png" alt="Verificado Icon">
+      </div>
+
+      <h2>TRACKER HÁBITOS</h2>
+      <p id="loginQuote" class="auth-subtitle">"Cargando frase..."</p>
+
+      <div id="loginPanel" class="auth-panel">
+        <input type="text" id="loginName" placeholder="Usuario">
+        <input type="password" id="loginPass" placeholder="Contraseña">
+        <button id="loginBtn" class="auth-primary">Iniciar sesión</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APLICACIÓN PRINCIPAL -->
+  <div class="main-container">
+    <header class="header">
+      <h1>MI DISCIPLINA</h1>
+      <button id="openProfile" class="settings-btn">Ajustes</button>
+    </header>
+
+    <div class="motivation-bar">
+      <span id="quoteText">"El éxito es la suma de pequeños esfuerzos."</span>
+      <span class="streak-tag">
+        <img id="streakImg" class="streak-icon" src="" alt="Llama">
+        <span id="streakLabel">Racha:</span> <span id="streakCount">0</span>
+      </span>
+    </div>
+
+    <!-- LISTA DE HÁBITOS -->
+    <section class="habits-section">
+      <div class="add-habit-box">
+        <input type="text" id="habitInput" placeholder="Añadir hábito...">
+        <select id="categorySelect">
+          <option value="Salud">🏥 Salud</option>
+          <option value="Estudio">📚 Estudio</option>
+          <option value="Personal">👤 Personal</option>
+          <option value="__NEW__">+ Nueva categoría...</option>
+        </select>
+        <button id="addHabitBtn">Añadir</button>
+      </div>
+
+      <div id="filtersBar" class="filters-bar"></div>
+
+      <ul id="habitList" class="habit-list"></ul>
+    </section>
+
+    <!-- GRÁFICOS -->
+    <section class="charts-grid">
+      <!-- QUESITO / DONUT -->
+      <div class="chart-card">
+        <h3>Progreso Hoy</h3>
+        <div class="pie-chart-wrapper">
+          <svg width="120" height="120" viewBox="0 0 42 42">
+            <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--dot-empty)" stroke-width="5"></circle>
+            <circle id="pieSegment" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--accent-color)" stroke-width="5" stroke-dasharray="0 100" stroke-dashoffset="0"></circle>
+          </svg>
+          <div id="piePercent" class="pie-center-text">0%</div>
+        </div>
+      </div>
+
+      <!-- GRÁFICO DE LÍNEAS MENSUAL -->
+      <div class="chart-card">
+        <h3>Rendimiento Mensual</h3>
+        <div class="line-chart-container">
+          <svg id="monthlyLineChart" class="line-chart-svg" viewBox="0 0 300 100" preserveAspectRatio="none">
+            <!-- La línea y los puntos se generan por JavaScript -->
+          </svg>
+        </div>
+      </div>
+
+      <!-- PROGRESO ANUAL (365 DÍAS DE IZQUIERDA A DERECHA) -->
+      <div class="chart-card full-width">
+        <h3>Progreso Anual (365 Días)</h3>
+        <div class="year-grid-container">
+          <div id="yearGrid" class="year-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL PERFIL Y AJUSTES -->
+    <aside id="profilePanel" class="profile-panel hidden">
+      <h3>Ajustes de Perfil</h3>
+      <p><strong>Usuario:</strong> <span id="profileName">-</span></p>
+      
+      <label for="themeSelect">Tema Visual:</label>
+      <select id="themeSelect" class="theme-select">
+        <option value="theme-default">Oscuro (Default)</option>
+        <option value="theme-neon">Neón Cyber</option>
+        <option value="theme-light">Claro</option>
+        <option id="goldThemeOption" value="theme-gold" disabled>🔒 Tema Oro (Requiere 365 días)</option>
+      </select>
+
+      <button id="exportBtn" class="json-btn">📥 Exportar Datos (JSON)</button>
+      <button id="importBtn" class="json-btn">📤 Importar Datos (JSON)</button>
+      <input type="file" id="importInput" accept=".json" class="hidden">
+
+      <button id="clearLocal" class="theme-btn">Cerrar Sesión</button>
+      <button id="closeProfile" class="theme-btn">Cerrar</button>
+    </aside>
+  </div>
+
+  <footer class="creators-footer">
+    *Creadores de páginas webs
+  </footer>
+
+  <!-- FIREBASE Y LÓGICA DE LA APP -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDwLTK1bT2nB215W03Ot2N6UxEsLbN36Jk",
+      authDomain: "ethos-brawl-tracker.firebaseapp.com",
+      projectId: "ethos-brawl-tracker",
+      storageBucket: "ethos-brawl-tracker.firebasestorage.app",
+      messagingSenderId: "706650010986",
+      appId: "1:706650010986:web:a36704353f52b094a4e113"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const STREAK_ICONS = {
+      INACTIVE: "https://img.pikbest.com/png-images/20250706/dark-gray-flame-with-white-outline-isolated-on-transparent-background_11773971.png!sw800",
+      LEVEL_1: "https://images.vexels.com/media/users/3/137393/isolated/preview/2a0f2889349241b1d7db900c156da20e-ilustracion-de-dibujos-animados-de-llama-naranja.png",
+      LEVEL_2: "https://images.vexels.com/media/users/3/145660/isolated/lists/94d2a930fb6c45aa7821ca129c7c807e-silueta-de-la-llama.png",
+      LEVEL_3: "https://png.pngtree.com/png-vector/20240901/ourmid/pngtree-blue-flame-clipart-illustration-watercolor-png-image_13699227.png",
+      LEVEL_4: "https://png.pngtree.com/png-vector/20240904/ourmid/pngtree-purplefire-vector-png-image_13731955.png",
+      LEVEL_5: "https://png.pngtree.com/png-vector/20241113/ourmid/pngtree-metallic-gold-flame-logo-design-png-image_14413457.png"
+    };
+
+    // COLECCIÓN AMPLIADA DE CITAS FAMOSAS, SERIES Y PERSONAJES
+    const POP_CULTURE_QUOTES = [
+      "\"No hay nada de malo en ser un perdedor, siempre y cuando seas uno bueno.\" — Walter White (Breaking Bad)",
+      "\"Con un gran poder viene una gran responsabilidad.\" — Uncle Ben (Spider-Man)",
+      "\"Que la Fuerza te acompañe.\" — Han Solo (Star Wars)",
+      "\"Winter is coming.\" — Eddard Stark (Game of Thrones)",
+      "\"I am Iron Man.\" — Tony Stark (Avengers)",
+      "\"No te compares con nadie en este mundo. Si lo haces, te estás insultando a ti mismo.\" — Bill Gates",
+      "\"El único modo de hacer un gran trabajo es amar lo que haces.\" — Steve Jobs",
+      "\"No puedes pasar.\" — Gandalf (El Señor de los Anillos)",
+      "\"La vida es como una caja de bombones, nunca sabes lo que te va a tocar.\" — Forrest Gump",
+      "\"Hakuna Matata, vive y sé feliz.\" — Timón y Pumba (El Rey León)",
+      "\"Caerse está permitido, levantarse es obligatorio.\" — Proverbio Japonés",
+      "\"Un hombre que no pasa tiempo con su familia nunca puede ser un verdadero hombre.\" — Vito Corleone (El Padrino)",
+      "\"Por qué tan serio?\" — Joker (The Dark Knight)",
+      "\"La mente es su propio lugar, y en sí misma puede hacer un cielo del infierno o un infierno del cielo.\" — John Milton",
+      "\"Lo único que debemos temer es al temor mismo.\" — Franklin D. Roosevelt"
+    ];
+
+    const MAIN_QUOTES = [
+      "El éxito es la suma de pequeños esfuerzos repetidos día tras día.",
+      "No cuentes los días, haz que los días cuenten.",
+      "La disciplina es el puente entre tus metas y tus logros.",
+      "Tu único límite eres tú mismo."
+    ];
+
+    let user = null;
+    let habits = JSON.parse(localStorage.getItem("trackerHabits")) || [];
+    let history = JSON.parse(localStorage.getItem("trackerHistory")) || {};
+    let customCategories = JSON.parse(localStorage.getItem("trackerCategories")) || ["Salud", "Estudio", "Personal"];
+    let currentTheme = localStorage.getItem("trackerTheme") || "theme-default";
+    let activeFilter = "Todos";
+
+    document.body.className = currentTheme;
+    document.getElementById("themeSelect").value = currentTheme;
+    document.getElementById("quoteText").textContent = `"${MAIN_QUOTES[new Date().getDate() % MAIN_QUOTES.length]}"`;
+
+    // CAMBIO ALEATORIO DIARIO DE FRASE DE LOGIN
+    function setDailyLoginQuote() {
+      const today = new Date();
+      const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+      const randomIndex = seed % POP_CULTURE_QUOTES.length;
+      document.getElementById("loginQuote").textContent = POP_CULTURE_QUOTES[randomIndex];
+    }
+    setDailyLoginQuote();
+
+    function checkAuth() {
+      if (!user) {
+        document.getElementById("authOverlay").classList.remove("hidden");
+      } else {
+        document.getElementById("authOverlay").classList.add("hidden");
+        document.getElementById("profileName").textContent = user.name;
+        renderCategoryOptions();
+        saveAndRender();
+      }
+    }
+    checkAuth();
+
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const name = document.getElementById("loginName").value.trim();
+      const pass = document.getElementById("loginPass").value.trim();
+      if (!name || !pass) return alert("Completa los campos");
+
+      const ref = doc(db, "users", name);
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        if (snap.data().password !== pass) {
+          return alert("Contraseña incorrecta");
+        }
+      } else {
+        await setDoc(ref, { password: pass });
+      }
+
+      user = { name };
+      checkAuth();
+    });
+
+    const categorySelect = document.getElementById("categorySelect");
+    categorySelect.addEventListener("change", (e) => {
+      if (e.target.value === "__NEW__") {
+        const newCat = prompt("Introduce el nombre de la nueva categoría:");
+        if (newCat && newCat.trim() !== "") {
+          const formatted = newCat.trim();
+          if (!customCategories.includes(formatted)) {
+            customCategories.push(formatted);
+            localStorage.setItem("trackerCategories", JSON.stringify(customCategories));
+          }
+          renderCategoryOptions();
+          categorySelect.value = formatted;
+        } else {
+          categorySelect.value = customCategories[0] || "Personal";
+        }
+      }
+    });
+
+    function renderCategoryOptions() {
+      categorySelect.innerHTML = customCategories.map(c => `<option value="${c}">${c}</option>`).join('') +
+        `<option value="__NEW__">+ Nueva categoría...</option>`;
+
+      const filtersBar = document.getElementById("filtersBar");
+      filtersBar.innerHTML = `<button class="filter-btn ${activeFilter === 'Todos' ? 'active' : ''}" onclick="setFilter('Todos')">Todos</button>` +
+        customCategories.map(c => `<button class="filter-btn ${activeFilter === c ? 'active' : ''}" onclick="setFilter('${c}')">${c}</button>`).join('');
+    }
+
+    document.getElementById("addHabitBtn").addEventListener("click", () => {
+      const text = document.getElementById("habitInput").value.trim();
+      const cat = categorySelect.value;
+      if (!text || cat === "__NEW__") return;
+
+      habits.push({ id: Date.now(), name: text, category: cat, completed: false });
+      document.getElementById("habitInput").value = "";
+      saveAndRender();
+    });
+
+    window.toggleHabit = (id) => {
+      habits = habits.map(h => h.id === id ? { ...h, completed: !h.completed } : h);
+      saveAndRender();
+    };
+
+    window.deleteHabit = (id) => {
+      habits = habits.filter(h => h.id !== id);
+      saveAndRender();
+    };
+
+    window.setFilter = (cat) => {
+      activeFilter = cat;
+      renderCategoryOptions();
+      renderHabits();
+    };
+
+    function saveAndRender() {
+      localStorage.setItem("trackerHabits", JSON.stringify(habits));
+      
+      const today = new Date().toISOString().split('T')[0];
+      const total = habits.length;
+      const done = habits.filter(h => h.completed).length;
+      history[today] = total > 0 ? (done / total) : 0;
+      localStorage.setItem("trackerHistory", JSON.stringify(history));
+
+      renderHabits();
+      renderCharts();
+      calculateStreak();
+    }
+
+    function renderHabits() {
+      const filtered = activeFilter === "Todos" ? habits : habits.filter(h => h.category === activeFilter);
+      document.getElementById("habitList").innerHTML = filtered.map(h => `
+        <li class="habit-item ${h.completed ? 'completed' : ''}">
+          <span>[${h.category}] ${h.name}</span>
+          <div>
+            <button onclick="toggleHabit(${h.id})" style="padding: 5px 10px; cursor:pointer;">${h.completed ? '✓' : '◯'}</button>
+            <button onclick="deleteHabit(${h.id})" style="padding: 5px 10px; cursor:pointer; color:red;">✕</button>
+          </div>
+        </li>
+      `).join('');
+    }
+
+    // RENDERIZADO DE GRÁFICOS
+    function renderCharts() {
+      const total = habits.length;
+      const done = habits.filter(h => h.completed).length;
+      const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+
+      document.getElementById("pieSegment").setAttribute("stroke-dasharray", `${percent} 100`);
+      document.getElementById("piePercent").textContent = `${percent}%`;
+
+      // GRÁFICO DE LÍNEAS MENSUAL (Días del mes actual)
+      const lineSvg = document.getElementById("monthlyLineChart");
+      lineSvg.innerHTML = "";
+
+      const now = new Date();
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const points = [];
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const d = new Date(now.getFullYear(), now.getMonth(), day);
+        const dateStr = d.toISOString().split('T')[0];
+        const val = history[dateStr] !== undefined ? history[dateStr] : 0;
+        
+        const x = ((day - 1) / (daysInMonth - 1)) * 280 + 10;
+        const y = 90 - (val * 80);
+        points.push({ x, y, val, dateStr });
+      }
+
+      // Dibujar polilínea de tendencia
+      const pointsString = points.map(p => `${p.x},${p.y}`).join(" ");
+      const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+      polyline.setAttribute("fill", "none");
+      polyline.setAttribute("stroke", "var(--accent-color)");
+      polyline.setAttribute("stroke-width", "3");
+      polyline.setAttribute("points", pointsString);
+      lineSvg.appendChild(polyline);
+
+      // Dibujar nodos/puntos
+      points.forEach(p => {
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", p.x);
+        circle.setAttribute("cy", p.y);
+        circle.setAttribute("r", "4");
+        circle.setAttribute("fill", "var(--accent-color)");
+        
+        const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+        title.textContent = `${p.dateStr}: ${Math.round(p.val * 100)}%`;
+        circle.appendChild(title);
+        
+        lineSvg.appendChild(circle);
+      });
+
+      // PROGRESO ANUAL (365 DÍAS - DE IZQUIERDA A DERECHA EN ORDEN CRONOLÓGICO)
+      const yearGrid = document.getElementById("yearGrid");
+      yearGrid.innerHTML = "";
+      for (let i = 364; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        const dayProgress = history[dateStr] || 0;
+
+        const yDot = document.createElement("div");
+        let lvl = "";
+        if (dayProgress > 0.8) lvl = "lvl-3";
+        else if (dayProgress > 0.4) lvl = "lvl-2";
+        else if (dayProgress > 0) lvl = "lvl-1";
+
+        yDot.className = `year-dot ${lvl}`;
+        yDot.title = `${dateStr}: ${Math.round(dayProgress * 100)}%`;
+        yearGrid.appendChild(yDot);
+      }
+    }
+
+    function calculateStreak() {
+      const today = new Date().toISOString().split('T')[0];
+      const todayDone = history[today] && history[today] > 0;
+
+      let streak = 0;
+      let d = new Date();
+
+      if (!todayDone) {
+        d.setDate(d.getDate() - 1);
+      }
+
+      while (true) {
+        const dateStr = d.toISOString().split('T')[0];
+        if (history[dateStr] && history[dateStr] > 0) {
+          streak++;
+          d.setDate(d.getDate() - 1);
+        } else break;
+      }
+
+      const streakImg = document.getElementById("streakImg");
+      const streakLabel = document.getElementById("streakLabel");
+      const streakCount = document.getElementById("streakCount");
+      const goldOption = document.getElementById("goldThemeOption");
+
+      streakCount.textContent = streak;
+
+      if (!todayDone || streak === 0) {
+        streakImg.src = STREAK_ICONS.INACTIVE;
+        streakLabel.textContent = "Racha:";
+      } else if (streak >= 1 && streak <= 9) {
+        streakImg.src = STREAK_ICONS.LEVEL_1;
+        streakLabel.textContent = "Racha:";
+      } else if (streak >= 10 && streak <= 29) {
+        streakImg.src = STREAK_ICONS.LEVEL_2;
+        streakLabel.textContent = "Racha:";
+      } else if (streak >= 30 && streak <= 99) {
+        streakImg.src = STREAK_ICONS.LEVEL_3;
+        streakLabel.textContent = "Racha:";
+      } else if (streak >= 100 && streak <= 364) {
+        streakImg.src = STREAK_ICONS.LEVEL_4;
+        streakLabel.textContent = "Racha:";
+      } else if (streak >= 365) {
+        streakImg.src = STREAK_ICONS.LEVEL_5;
+        streakLabel.textContent = "MASTERED:";
+        goldOption.removeAttribute("disabled");
+        goldOption.textContent = "👑 Tema Oro (Desbloqueado)";
+      }
+    }
+
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ habits, history, customCategories }));
+      const dlAnchor = document.createElement('a');
+      dlAnchor.setAttribute("href", dataStr);
+      dlAnchor.setAttribute("download", "ethos_tracker_backup.json");
+      dlAnchor.click();
+    });
+
+    document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importInput").click());
+    document.getElementById("importInput").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const data = JSON.parse(event.target.result);
+        if (data.habits && data.history) {
+          habits = data.habits;
+          history = data.history;
+          if (data.customCategories) customCategories = data.customCategories;
+          renderCategoryOptions();
+          saveAndRender();
+          alert("¡Datos importados con éxito!");
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById("themeSelect").addEventListener("change", (e) => {
+      currentTheme = e.target.value;
+      document.body.className = currentTheme;
+      localStorage.setItem("trackerTheme", currentTheme);
+    });
+
+    document.getElementById("openProfile").addEventListener("click", () => document.getElementById("profilePanel").classList.toggle("hidden"));
+    document.getElementById("closeProfile").addEventListener("click", () => document.getElementById("profilePanel").classList.add("hidden"));
+    document.getElementById("clearLocal").addEventListener("click", () => { localStorage.clear(); location.reload(); });
+  </script>
+</body>
+</html>
